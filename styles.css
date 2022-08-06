@@ -1,0 +1,85 @@
+body {
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 100px;
+}
+
+h1 {
+    color: #fc8485;
+}
+
+.pokeball {
+    width: 200px;
+    padding-top: 10px;
+}
+
+.search-container {
+    width: 100%;
+}
+
+.name-search-container {
+    display: flex;
+    flex-wrap: row wrap;
+    gap: 0.3em;
+}
+
+input:first-of-type {
+    width: 100%;
+    padding: 0.5em;
+    font-size: large;
+    border-radius: 12px;
+    border-color: #003a70;
+}
+
+#more {
+    display: none;
+    border: solid 2px #003a70;
+    border-radius: 12px;
+    margin-top: 0.3em;
+    padding: 0.3em;
+    min-height: 200px;
+    width: 100%;
+}
+
+.dropdown {
+    margin-top: 0.3em;
+}
+
+#card-container {
+    margin-top: 1em;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+}
+
+button {
+    padding: 0.5em;
+    background-color: #fc8485;
+    border: solid 2px black;
+    border-radius: 12px;
+    color: white;
+    font-size: large;
+    width: 200px;
+    cursor: pointer;
+}
+
+button:active {
+    background-color: #ffcb05;
+}
+
+@media only screen and (max-width: 650px) {
+    .dropdown {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
