@@ -9,7 +9,7 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    margin-bottom: 100px;
+    margin-bottom: 200px;
 }
 
 h1 {
@@ -21,7 +21,7 @@ h1 {
     padding-top: 10px;
 }
 
-.search-container {
+.content-container {
     width: 100%;
 }
 
@@ -36,28 +36,32 @@ input:first-of-type {
     padding: 0.5em;
     font-size: large;
     border-radius: 12px;
-    border-color: #003a70;
 }
 
-#more {
-    display: none;
-    border: solid 2px #003a70;
-    border-radius: 12px;
-    margin-top: 0.3em;
-    padding: 0.3em;
-    min-height: 200px;
+.showcase-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.5em;
     width: 100%;
 }
 
-.dropdown {
-    margin-top: 0.3em;
+.buttons-container {
+    align-self: flex-start;
+}
+
+#hidden-span {
+    display: none;
 }
 
 #card-container {
-    margin-top: 1em;
+    margin-top: 0.5em;
+    padding: 0.3em;
     display: flex;
-    flex-flow: row wrap;
+    flex-wrap: wrap;
     justify-content: space-around;
+    border: solid 2px black;
+    border-radius: 12px;
+    min-height: 130px;
 }
 
 button {
@@ -72,14 +76,12 @@ button {
 }
 
 button:active {
-    background-color: #ffcb05;
+    background-color: white;
+    color: #fc8485;
+   
 }
 
 @media only screen and (max-width: 650px) {
-    .dropdown {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
+
 }
 

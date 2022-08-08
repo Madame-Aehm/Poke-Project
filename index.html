@@ -15,31 +15,45 @@
         alt="Image of PokeBall"
       />
       <h1>Find Your 'Mon</h1>
-      <div class="search-container">
+      <div class="content-container">
         <div class="name-search-container">
           <input
             id="poke-name-search"
             type="text"
             placeholder="Type name of Pokemon"
             list="all-pokemon"
-            required
           />
           <datalist id="all-pokemon"></datalist>
-          <button type="submit" id="search-button">Show my 'Mon!</button>
+          <button type="submit" id="search-button">Go!</button>
         </div>
-        <div class="dropdown">
-          <button onclick="showMore()" onclick="buttonClicked()" id="showMore">
-            Not sure...? ▼
-          </button>
-          <div id="more">
-            <button id="show-random">Pick me 5!</button>
-            <div id="card-container"></div>
+        <div class="showcase-container">
+          <div class="buttons-container">
+            <button id="show-random">Shuffle!</button>
+            <button
+              onclick="showFilters()"
+              id="showFilters"
+            >
+              Show Filters »»»
+            </button>
+            <span id="hidden-span">
+              <select id="type1" name="type1">
+                <option value="">Select Type1...</option>
+              </select>
+              <select id="type2" name="type2">
+                <option value="">Select Type2...</option>
+              </select>
+              <select id="colour" name="colour">
+                <option value="">Select Colour...</option>
+              </select>
+              <select id="mega" name="mega">
+                <option value="">Select Shape...</option>
+              </select>
+            </span>
           </div>
-        </div>
+          <div id="card-container"></div>
       </div>
-
-      <button id="clear">Clear</button>
     </div>
+    <button id="clear" onclick="removeExistingData()">Clear</button>
 
     <script src="main.js"></script>
   </body>
