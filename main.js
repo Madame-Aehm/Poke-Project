@@ -10,6 +10,7 @@ const ddType1 = document.getElementById("type1");
 const ddType2 = document.getElementById("type2");
 const ddColour = document.getElementById("colour");
 const ddMega = document.getElementById("mega");
+const nameSearchArray = [];
 
 function showFilters () {
     if (hiddenSpan.style.display === "inline") {
@@ -41,14 +42,20 @@ function fullFetch () {
     }).catch((error)=>{console.log(error)}) 
 }
 
-function makeSearchSuggestions(fullList) {
-    let dataOptionsList = [];                               //look at this again later to remove duplicate options
-    for (let i = 0; i < fullList.length; i++) {
+function makeSearchSuggestions(list) {
+    clearDataList()
+    for (let i = 0; i < list.length; i++) {
         const searchOption = document.createElement("option");
-        searchOption.setAttribute("value", fullList[i].name);
-        searchOption.innerHTML = fullList[i].name;
+        searchOption.setAttribute("value", list[i].name);
+        searchOption.innerHTML = list[i].name;
         dataList.appendChild(searchOption);
     }
+    console.log(list);
+}
+
+function clearDataList() {
+    dataList.innerHTML = "";
+    console.log("data list cleared");
 }
 
 function makeFullSearch (fullList) {
@@ -126,8 +133,14 @@ function fullListController (fullList) {
 }
 
 function setEventListeners(fullList) {
+    nameSearch.addEventListener("click", function() {
+        if (ddType1.value) {
+            console.log("type1 selected")
+        } else {
+            makeSearchSuggestions(fullList)
+        }
+    })
     randomButton.addEventListener("click",() => takeFive(fullList));
-    nameSearch.addEventListener("input",() => makeSearchSuggestions(fullList));
     searchButton.addEventListener("click",() => makeFullSearch(fullList));
     nameSearch.addEventListener("keypress", (e) => {
         if (e.key === 'Enter') {
@@ -179,17 +192,31 @@ function getSingleTypeList() {
         fetch(`https://pokeapi.co/api/v2/type/${typeURL}/`).then((response) => response.json())
         .then((result) => {
             const typeList = result.pokemon
-            console.log(typeList);
+            makeCompatibleArray(typeList);
             return typeList;
         }).catch((error)=>{console.log(error)}) 
     }
 }
 
-function ddFillType2(typesList) {                                //*only works for first selection - have to find a way to reset for each new selection
+function makeCompatibleArray (typeList) {
+    const newArray = [];
+    for (let i = 0; i < typeList.length; i++)  {
+        newArray.push(typeList[i].pokemon)
+    }
+    nameSearch.addEventListener("click", function() {
+        if (ddType1.value) {
+        makeSearchSuggestions(newArray);
+        }
+    });
+    console.log(newArray);
+}
+
+function ddFillType2(typesList) {  
+        clearddType2(); 
         const editedList = [];
         for (let i = 0; i < typesList.length; i++) {
             if (typesList[i].name !== ddType1.value) {
-                editedList.push(typesList[i])
+            editedList.push(typesList[i])
             }
         }
         for (let i = 0; i < editedList.length; i++) {
@@ -198,6 +225,10 @@ function ddFillType2(typesList) {                                //*only works f
             option.innerHTML = editedList[i].name;
             ddType2.appendChild(option);
         }
+}
+
+function clearddType2() {
+    ddType2.options.length = 1;
 }
 
 
