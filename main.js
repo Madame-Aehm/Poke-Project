@@ -10,7 +10,6 @@ const ddType1 = document.getElementById("type1");
 const ddType2 = document.getElementById("type2");
 const ddColour = document.getElementById("colour");
 const ddMega = document.getElementById("mega");
-const nameSearchArray = [];
 
 function showFilters () {
     if (hiddenSpan.style.display === "inline") {
@@ -198,6 +197,45 @@ function getSingleTypeList() {
     }
 }
 
+function get2ndSingleTypeList(type1List) {
+    if (ddType1.value && ddType2.value) {
+        let type2URL = ddType2.value;
+        fetch(`https://pokeapi.co/api/v2/type/${type2URL}/`).then((response) => response.json())
+        .then((result) => {
+            const type2List = result.pokemon
+            combineTypeLists(type1List, type2List);
+            return type2List;
+        }).catch((error)=>{console.log(error)})
+    }
+}
+
+function combineTypeLists (type1, type2) {
+    const newType2Array = [];
+    for (let i = 0; i < type2.length; i++) {
+        newType2Array.push(type2[i].pokemon);
+    }
+    const bothTypesArray = [].concat(type1, newType2Array);
+    createDuelTypeArray(bothTypesArray);
+}
+
+function createDuelTypeArray(bothTypesArray) {
+    console.log(bothTypesArray);
+    const duelTypeArray = [];
+    let duplicate = "";
+    for (let i = 0; i <= bothTypesArray.length; i++) {
+        console.log(bothTypesArray[i].name);
+        // for (let j = 0; j <= bothTypesArray.length; i++) {
+        //     if (i !== j) {
+        //         if (bothTypesArray[i].name === bothTypesArray[j].name) {
+        //             duplicate = bothTypesArray[j];
+        //             duelTypeArray.push(duplicate);                                      //? whyyyyyyyyyyyy?
+        //             console.log(duelTypeArray);
+        //         }
+        //     }
+        // }
+    }
+}
+
 function makeCompatibleArray (typeList) {
     const newArray = [];
     for (let i = 0; i < typeList.length; i++)  {
@@ -208,7 +246,9 @@ function makeCompatibleArray (typeList) {
         makeSearchSuggestions(newArray);
         }
     });
-    console.log(newArray);
+    ddType2.addEventListener("change",() => {
+        get2ndSingleTypeList(newArray);
+    });
 }
 
 function ddFillType2(typesList) {  
@@ -219,11 +259,13 @@ function ddFillType2(typesList) {
             editedList.push(typesList[i])
             }
         }
-        for (let i = 0; i < editedList.length; i++) {
-            const option = document.createElement("option");
-            option.setAttribute("value", editedList[i].name);
-            option.innerHTML = editedList[i].name;
-            ddType2.appendChild(option);
+        if (ddType1.value !== "") {
+            for (let i = 0; i < editedList.length; i++) {
+                const option = document.createElement("option");
+                option.setAttribute("value", editedList[i].name);
+                option.innerHTML = editedList[i].name;
+                ddType2.appendChild(option);
+            }
         }
 }
 
@@ -234,12 +276,14 @@ function clearddType2() {
 
 
 
+
+
+
+
 // function createPokeArray(pokeArray, singlePoke) {
 //     pokeArray.push(singlePoke);
 //     console.log(pokeArray);
 // }
-
-
 
 // function extractUrls (fullList){
 //     for (let i = 0; i < fullList.length; i++) {

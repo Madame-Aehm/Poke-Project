@@ -13,12 +13,34 @@ body {
 }
 
 h1 {
-    color: #fc8485;
+    color: #dc7475;
 }
 
 .pokeball {
     width: 200px;
     padding-top: 10px;
+}
+
+.pokeball:hover {
+    animation-name: shake;
+    animation-duration: 1s;
+}
+
+@keyframes shake {
+    /* @keyframes shake {
+        20% { transform: rotate(-20deg); 
+                transform-origin: 75% 100%}
+        30% { transform: translate(10px, 0) rotate(20deg); }
+        50% { transform: translate(-10px, 0) rotate(-10deg); }
+        60% { transform: translate(10px, 0) rotate(10deg); }
+        100% { transform: translate(0, 0) rotate(0); }
+      } */
+    25% {transform: rotate(5deg);
+    transform-origin: bottom;}
+    50% {transform: rotate(-5deg);
+        transform-origin: bottom;}
+    75% {transform: rotate(5deg);
+        transform-origin: bottom;}
 }
 
 .content-container {
@@ -75,9 +97,13 @@ button {
     cursor: pointer;
 }
 
+button:hover {
+    background-color: #dc7475;
+}
+
 button:active {
     background-color: white;
-    color: #fc8485;
+    color: #dc7475;
    
 }
 
