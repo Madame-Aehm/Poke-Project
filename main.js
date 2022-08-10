@@ -10,11 +10,14 @@ const ddType1 = document.getElementById("type1");
 const ddType2 = document.getElementById("type2");
 const ddColour = document.getElementById("colour");
 const ddMega = document.getElementById("mega");
+const allSelectors = document.querySelectorAll("select");
+const buttonPlacement = document.getElementById("show-random-placement");
 
 function showFilters () {
     if (hiddenSpan.style.display === "inline") {
         hiddenSpan.style.display = "none";
         buttonText.innerHTML = "Show Filters »»»";
+        // ddType1.value = "";                                                 //? this doesn't count as a "change" :(
     } else {
         hiddenSpan.style.display = "inline";
         buttonText.innerHTML = "««« Hide Filters";
@@ -22,9 +25,7 @@ function showFilters () {
 }
 
 function removeExistingData (){
-    while (cardContainer.firstChild) {
-            cardContainer.removeChild(cardContainer.firstChild)
-    }
+    cardContainer.innerHTML = "";
 }
 
   function shuffleList(fullList) {
@@ -36,13 +37,20 @@ function fullFetch () {
          return response.json()     
     }).then((result) => {
         const fullList = result.results
+        // const URLarray = fullList.map(element=> element.url)
+        // console.log('URLarray :>> ', URLarray);
+        // fetchSingleUrl(URLarray)
         fullListController(fullList)
         return fullList  
     }).catch((error)=>{console.log(error)}) 
 }
 
+// const  fetchSingleUrl = (URLarray) => {
+//     Promise.all(URLarray.map(url=> fetch(url).then((response)=>response.json()))).then((result)=> console.log('result :>> ', result))
+// }
+
 function makeSearchSuggestions(list) {
-    clearDataList()
+    dataList.innerHTML = "";
     for (let i = 0; i < list.length; i++) {
         const searchOption = document.createElement("option");
         searchOption.setAttribute("value", list[i].name);
@@ -52,27 +60,38 @@ function makeSearchSuggestions(list) {
     console.log(list);
 }
 
-function clearDataList() {
-    dataList.innerHTML = "";
-    console.log("data list cleared");
+function reset (fullList) {
+    let empty = "";
+    for (let i = 0; i < allSelectors.length; i++) {
+        if (allSelectors[i].value === "") {
+            empty = "empty"
+        } else empty = "not empty";
+            break;
+        }
+    if (empty === "empty") {
+        makeSearchSuggestions(fullList);
+        let buttonClone = randomButton.cloneNode(true);                                                   //? randomButton is now clone.........
+        // buttonPlacement.appendChild(buttonClone);
+        // randomButton.remove();
+        // buttonClone.addEventListener("click",() => takeFive(fullList));
+        // buttonClone = randomButton;
+    }
 }
 
-function makeFullSearch (fullList) {
-    let found = null;
-    for (let i = 0; i < fullList.length; i++) {
-        if (fullList[i].name === nameSearch.value) {
-            found = "search successful";
-            fetchSinglePoke(fullList[i].url);
-            monHere(fullList);
-            return found;
+function makeSearch (list) {
+    // let enteredText = nameSearch.value;
+    // enteredText.trim();                                                         //? want to incorporate this somehow
+    let found = "";
+    for (let i = 0; i < list.length; i++) {
+        if (list[i].name === nameSearch.value) {
+            found = "match found";
+            removeExistingData();
+            fetchSinglePoke(list[i].url);
+            break;
         } else {
             noMonHere();
         }
     }
-}
-
-function monHere() {
-    removeExistingData();
 }
 
 function noMonHere() {
@@ -118,11 +137,11 @@ function createCard(singlePoke) {
     cardDiv.appendChild(img);
 }
 
-function takeFive (takeFive) {
+function takeFive (list) {
     removeExistingData()
     const newArray = [];
-    for (let i = 0; i < takeFive.length; i++) {
-        newArray.push(takeFive[i])
+    for (let i = 0; i < list.length; i++) {
+        newArray.push(list[i])
     }
     shuffleList(newArray);
     for (let i = 0; i < 5; i++) {
@@ -131,31 +150,26 @@ function takeFive (takeFive) {
     }
 }
 
-function fullListController (fullList) {
-   setEventListeners(fullList)
-}
-
 function setEventListeners(fullList) {
-    nameSearch.addEventListener("click", function() {
-        if (ddType1.value) {
-            console.log("type1 selected")
-        } else {
-            makeSearchSuggestions(fullList)
-        }
-    })
+    ddType1.addEventListener("change", () => reset(fullList)); //will have to put this on other select inputs when they are used
     randomButton.addEventListener("click",() => takeFive(fullList));
-    searchButton.addEventListener("click",() => makeFullSearch(fullList));
+    searchButton.addEventListener("click",() => makeSearch(fullList));
     nameSearch.addEventListener("keypress", (e) => {
         if (e.key === 'Enter') {
-            makeFullSearch(fullList);
+            makeSearch(fullList);
           }
     });
+}
+
+function fullListController (fullList) {
+    reset(fullList);
+    setEventListeners(fullList)
 }
 
 fullFetch();
 
 
-//* /////////////////////// add filters /////////////////////////////
+//* /////////////////////// add type filters /////////////////////////////
 
 function typesFetch() {
     fetch("https://pokeapi.co/api/v2/type/").then((response) => response.json())
@@ -165,8 +179,6 @@ function typesFetch() {
         return typesList;
     }).catch((error)=>{console.log(error)}) 
 }
-
-typesFetch();
 
 function typesController(typesList) {
     ddFillType1(typesList);
@@ -191,72 +203,51 @@ function addTypeEL(typesList) {
 
 function getSingleTypeList() {
     if (ddType1.value) {
-        let typeURL = ddType1.value;
-        fetch(`https://pokeapi.co/api/v2/type/${typeURL}/`).then((response) => response.json())
+        let pokemonName = ddType1.value;
+        fetch(`https://pokeapi.co/api/v2/type/${pokemonName}/`).then((response) => response.json())
         .then((result) => {
-            const typeList = result.pokemon
-            makeCompatibleArray(typeList);
-            return typeList;
-        }).catch((error)=>{console.log(error)}) 
+            const typeList = result.pokemon;
+            const compatibleType1 = typeList.map((element) => element.pokemon);
+            ddType2.addEventListener("change",() => get2ndSingleTypeList(compatibleType1));
+            makeSearchSuggestions(compatibleType1);
+            randomButton.removeEventListener("click",() => takeFive(fullList), false);                 //?how to remove and replace event listener???? neither of these work
+            randomButton.removeEventListener("click", () => takeFive(fullList), true);
+            randomButton.addEventListener("click",() => takeFive(compatibleType1));
+
+            // const buttonClone = randomButton.cloneNode(true);
+            // randomButton.remove();
+            // buttonPlacement.appendChild(buttonClone);
+            // buttonClone.addEventListener("click",() => takeFive(compatibleType1));
+            // buttonClone = randomButton;
+
+            // randomButton.remove().clone().appendTo(buttonPlacement);
+            // randomButton.addEventListener("click", () => takeFive(compatibleType1))
+        }).catch((error)=>{console.log(error)}); 
     }
 }
 
 function get2ndSingleTypeList(type1List) {
     if (ddType1.value && ddType2.value) {
-        let type2URL = ddType2.value;
-        fetch(`https://pokeapi.co/api/v2/type/${type2URL}/`).then((response) => response.json())
+        let pokemonName = ddType2.value;
+        fetch(`https://pokeapi.co/api/v2/type/${pokemonName}/`).then((response) => response.json())
         .then((result) => {
             const type2List = result.pokemon
-            combineTypeLists(type1List, type2List);
-            return type2List;
+            const compatibleType2 = type2List.map((element)=> {
+                return element.pokemon
+            });
+            const combinedList = [...type1List, ...compatibleType2];
+            const duplicateNames = combinedList.map(e => e.name).filter((e, i, array) => array.indexOf(e) !==i);
+            const duplicatesArray = combinedList.filter(e => duplicateNames.includes(e.name));
+            const duelTypesList = duplicatesArray.map(e => e["name"])
+            .map((e, i, final) => final.indexOf(e) === i && i)                          //* store the keys of the unique objects
+            .filter(e => duplicatesArray[e]).map(e => duplicatesArray[e]);              //* eliminate the dead keys & store unique objects
+            makeSearchSuggestions(duelTypesList);
         }).catch((error)=>{console.log(error)})
     }
 }
 
-function combineTypeLists (type1, type2) {
-    const newType2Array = [];
-    for (let i = 0; i < type2.length; i++) {
-        newType2Array.push(type2[i].pokemon);
-    }
-    const bothTypesArray = [].concat(type1, newType2Array);
-    createDuelTypeArray(bothTypesArray);
-}
-
-function createDuelTypeArray(bothTypesArray) {
-    console.log(bothTypesArray);
-    const duelTypeArray = [];
-    let duplicate = "";
-    for (let i = 0; i <= bothTypesArray.length; i++) {
-        console.log(bothTypesArray[i].name);
-        // for (let j = 0; j <= bothTypesArray.length; i++) {
-        //     if (i !== j) {
-        //         if (bothTypesArray[i].name === bothTypesArray[j].name) {
-        //             duplicate = bothTypesArray[j];
-        //             duelTypeArray.push(duplicate);                                      //? whyyyyyyyyyyyy?
-        //             console.log(duelTypeArray);
-        //         }
-        //     }
-        // }
-    }
-}
-
-function makeCompatibleArray (typeList) {
-    const newArray = [];
-    for (let i = 0; i < typeList.length; i++)  {
-        newArray.push(typeList[i].pokemon)
-    }
-    nameSearch.addEventListener("click", function() {
-        if (ddType1.value) {
-        makeSearchSuggestions(newArray);
-        }
-    });
-    ddType2.addEventListener("change",() => {
-        get2ndSingleTypeList(newArray);
-    });
-}
-
 function ddFillType2(typesList) {  
-        clearddType2(); 
+        ddType2.options.length = 1;
         const editedList = [];
         for (let i = 0; i < typesList.length; i++) {
             if (typesList[i].name !== ddType1.value) {
@@ -273,10 +264,7 @@ function ddFillType2(typesList) {
         }
 }
 
-function clearddType2() {
-    ddType2.options.length = 1;
-}
-
+typesFetch();
 
 
 

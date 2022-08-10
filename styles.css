@@ -23,7 +23,7 @@ h1 {
 
 .pokeball:hover {
     animation-name: shake;
-    animation-duration: 0.3s;
+    animation-duration: 0.4s;
 }
 
 @keyframes shake {
@@ -59,7 +59,7 @@ input:first-of-type {
     width: 100%;
 }
 
-.buttons-container {
+#buttons-container {
     align-self: flex-start;
 }
 
