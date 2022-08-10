@@ -120,9 +120,13 @@ function createCard(singlePoke) {
 
 function takeFive (takeFive) {
     removeExistingData()
-    shuffleList(takeFive);
+    const newArray = [];
+    for (let i = 0; i < takeFive.length; i++) {
+        newArray.push(takeFive[i])
+    }
+    shuffleList(newArray);
     for (let i = 0; i < 5; i++) {
-        let singleURL = takeFive[i].url;
+        let singleURL = newArray[i].url;
         fetchSinglePoke(singleURL);
     }
 }
