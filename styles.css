@@ -3,7 +3,7 @@ body {
     justify-content: center;
 }
 
-.container {
+#container {
     width: 80%;
     display: flex;
     flex-direction: column;
@@ -37,56 +37,74 @@ h1 {
 
 .content-container {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    align-items: stretch;
 }
 
 .name-search-container {
     display: flex;
-    flex-wrap: row wrap;
     gap: 0.3em;
+    width: 100%;
 }
 
-input:first-of-type {
+.name-search-container > input {
     width: 100%;
     padding: 0.5em;
     font-size: large;
     border-radius: 12px;
 }
 
-.showcase-container {
-    display: flex;
-    flex-direction: column;
-    margin-top: 0.5em;
-    width: 100%;
-}
-
 #buttons-container {
-    align-self: flex-start;
+    width: 100%;
 }
 
 #hidden-span {
     display: none;
+    color: #dc7475;
+    background-color: #e0e0e0;
+    padding: 0.5em;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    width: 100%;
+    margin-top: 0.5em
 }
 
-#card-container {
+p {
     margin-top: 0.5em;
-    padding: 0.3em;
+    margin-bottom: 0.2em;
+    font-size: large;
+    font-weight: bold;
+}
+
+.hidden-content-container {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
+    align-content: space-between;
+    gap: 0.5em;
+}
+
+select {
     border: solid 2px black;
     border-radius: 12px;
-    min-height: 130px;
+    width: 100%;
+    padding: 0.5em;
+    font-size: large;
 }
 
 button {
-    padding: 0.5em;
+    padding: 1em;
     background-color: #fc8485;
     border: solid 2px black;
     border-radius: 12px;
     color: white;
     font-size: large;
-    width: 200px;
+    width: 160px;
     cursor: pointer;
+}
+
+.more {
+    padding: 0.5em;
 }
 
 button:hover {
@@ -97,6 +115,17 @@ button:active {
     background-color: white;
     color: #dc7475;
    
+}
+
+#card-container {
+    padding: 0.3em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    border: solid 2px black;
+    border-radius: 12px;
+    min-height: 130px;
+    width: 100%;
 }
 
 @media only screen and (max-width: 650px) {

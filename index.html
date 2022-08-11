@@ -8,7 +8,7 @@
     <title>Mon Finder</title>
   </head>
   <body>
-    <div class="container">
+    <div id="container">
       <img
         class="pokeball"
         src="assets/images/pokeball-image+.png"
@@ -26,34 +26,27 @@
           <datalist id="all-pokemon"></datalist>
           <button type="submit" id="search-button">Go!</button>
         </div>
-        <div class="showcase-container">
-          <div id="buttons-container">
-            <span id="show-random-placement">
-              <button id="show-random">Shuffle!</button>
-            </span>
-            <button
+          <div id="buttons-container">         
+            <button class="more"
               onclick="showFilters()"
               id="showFilters"
             >
-              Show Filters »»»
+              More ▼
             </button>
             <span id="hidden-span">
-              <select id="type1" name="type1">
-                <option value="">Select Type1...</option>
-              </select>
-              <select id="type2" name="type2">
-                <option value="">Select Type2...</option>
-              </select>
-              <select id="colour" name="colour">
-                <option value="">Select Colour...</option>
-              </select>
-              <select id="mega" name="mega">
-                <option value="">Select Shape...</option>
-              </select>
+              <p>Select type to limit search suggestions. Select additional type to limit search to duel types of both selections.</p>
+              <div class="hidden-content-container">
+                <select id="type1" name="type1">
+                  <option value="">Select Type...</option>
+                </select>
+                <select id="type2" name="type2">
+                  <option value="">Select Additional Type...</option>
+                </select>
+                <button id="show-random">Shuffle All!</button>
+              </div>
             </span>
           </div>
           <div id="card-container"></div>
-      </div>
     </div>
     <button id="clear" onclick="removeExistingData()">Clear</button>
 

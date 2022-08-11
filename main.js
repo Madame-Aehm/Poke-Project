@@ -1,3 +1,4 @@
+const body = document.querySelector("body");
 const cardContainer = document.getElementById("card-container");
 const buttonText = document.getElementById("showFilters");
 const hiddenSpan = document.getElementById("hidden-span");
@@ -12,15 +13,16 @@ const ddColour = document.getElementById("colour");
 const ddMega = document.getElementById("mega");
 const allSelectors = document.querySelectorAll("select");
 const buttonPlacement = document.getElementById("show-random-placement");
+const variationsCheck = document.getElementById("variations");
 
 function showFilters () {
-    if (hiddenSpan.style.display === "inline") {
+    if (hiddenSpan.style.display === "block") {
         hiddenSpan.style.display = "none";
-        buttonText.innerHTML = "Show Filters »»»";
+        buttonText.innerHTML = "More ▼";
         // ddType1.value = "";                                                 //? this doesn't count as a "change" :(
     } else {
-        hiddenSpan.style.display = "inline";
-        buttonText.innerHTML = "««« Hide Filters";
+        hiddenSpan.style.display = "block";
+        buttonText.innerHTML = "Less ▲";
     }
 }
 
@@ -70,11 +72,6 @@ function reset (fullList) {
         }
     if (empty === "empty") {
         makeSearchSuggestions(fullList);
-        let buttonClone = randomButton.cloneNode(true);                                                   //? randomButton is now clone.........
-        // buttonPlacement.appendChild(buttonClone);
-        // randomButton.remove();
-        // buttonClone.addEventListener("click",() => takeFive(fullList));
-        // buttonClone = randomButton;
     }
 }
 
@@ -82,16 +79,17 @@ function makeSearch (list) {
     // let enteredText = nameSearch.value;
     // enteredText.trim();                                                         //? want to incorporate this somehow
     let found = "";
-    for (let i = 0; i < list.length; i++) {
-        if (list[i].name === nameSearch.value) {
-            found = "match found";
-            removeExistingData();
-            fetchSinglePoke(list[i].url);
-            break;
-        } else {
-            noMonHere();
-        }
-    }
+        for (let i = 0; i < list.length; i++) {
+                if (list[i].name === nameSearch.value) {
+                    found = "match found";
+                    removeExistingData();
+                    fetchSinglePoke(list[i].url);
+                    break;
+                } else {
+                    noMonHere();
+                }
+            }
+    
 }
 
 function noMonHere() {
@@ -113,6 +111,7 @@ function fetchSinglePoke (pokeURL) {
         return response.json()
     }).then(function (result) {
         let singlePoke = result;
+        console.log(result);
         createCard(singlePoke);
         return singlePoke;
     }).catch((error)=>{console.log(error)})
@@ -135,6 +134,62 @@ function createCard(singlePoke) {
     img.setAttribute("src", singlePoke.sprites.front_default, "alt", singlePoke.name);
     }
     cardDiv.appendChild(img);
+
+    //*create modal////////////////////////
+    const modalBackground = document.createElement("div");
+    modalBackground.setAttribute("style", "display: none; position: fixed; top: 0; left: 0; z-index: 1; height: 100%; width: 100%; background-color: rgba(0,0,0,0.2);");
+    const modal = document.createElement("div");
+    modalBackground.addEventListener("click", () => modalBackground.style.display = "none");
+    modal.setAttribute("style", "display: flex; flex-direction: column; margin: 1% auto; border: solid 2px black; background-color: white; width: 80%; height: 90%; overflow: scroll;")
+    const modalHeader = document.createElement("div");
+    modalHeader.setAttribute("style", "display: flex; flex-direction: column; background-color: #fc8485;");
+    const close = document.createElement("span");
+    close.setAttribute("style", "align-self: flex-end; padding-right: 0.3em; color: white; font-size: 28px; font-weight: bold;");
+    close.addEventListener("mouseenter", () => close.setAttribute("style", "cursor: pointer; align-self: flex-end; padding-right: 0.3em; color: black; font-size: 28px; font-weight: bold;"));
+    close.addEventListener("mouseleave", () => close.setAttribute("style", "cursor: default; align-self: flex-end; padding-right: 0.3em; color: white; font-size: 28px; font-weight: bold;"));
+    close.addEventListener("click", () => modalBackground.style.display = "none");
+    close.innerHTML = "&times;";
+    const h1 = document.createElement("h1");
+    h1.setAttribute("style", "color: white; align-self: center; margin-top: 0;")
+    h1.innerHTML = singlePoke.name;
+    const modalContent1 = document.createElement("div");
+    modalContent1.setAttribute("style", "display: flex; flex-flow: row wrap; justify-content: space-evenly;")
+    const mainImg = document.createElement("img");
+    mainImg.setAttribute("src", singlePoke.sprites.other["official-artwork"].front_default, "alt", singlePoke.name);
+    mainImg.style.flexBasis = "40%"
+    const content1Right = document.createElement("div");
+    content1Right.setAttribute("style", "display: flex; flex-direction: column; border-left: solid 2px black; padding: 5%;");
+    const typeLine = document.createElement("div");
+    typeLine.setAttribute("style", "display: flex; gap: 1em;")
+    const typesH3 = document.createElement("h3");
+    typesH3.setAttribute("style", "color: #dc7475; margin-top: 0; margin-bottom: 0; margin right: 1em;");
+    typesH3.innerHTML = "Types: ";
+    const types = document.createElement("span");
+    if (singlePoke.types[1] !== undefined) {
+        types.innerHTML =
+        singlePoke.types[0].type.name +
+          " / " +
+          singlePoke.types[1].type.name;
+      } else {
+        types.innerHTML = singlePoke.types[0].type.name;
+      }
+
+    typeLine.append(typesH3, types)
+    content1Right.append(typeLine);
+    
+
+
+    modalContent1.append(mainImg, content1Right);
+    modalHeader.append(close, h1);
+    modal.append(modalHeader, modalContent1);
+    modalBackground.appendChild(modal);
+    body.appendChild(modalBackground);
+
+
+
+    cardDiv.addEventListener("click", () => {
+        modalBackground.style.display = "block";
+    })
 }
 
 function takeFive (list) {
@@ -150,9 +205,16 @@ function takeFive (list) {
     }
 }
 
+function activateShuffle (list) {
+    const notAnotherFunction = () => takeFive(list); 
+    randomButton.removeEventListener("click", notAnotherFunction)
+    randomButton.addEventListener("click", notAnotherFunction);
+}
+
 function setEventListeners(fullList) {
-    ddType1.addEventListener("change", () => reset(fullList)); //will have to put this on other select inputs when they are used
-    randomButton.addEventListener("click",() => takeFive(fullList));
+    ddType1.addEventListener("change", () => reset(fullList));
+    // randomButton.addEventListener("click", takeFive(fullList));          //? why doesn't it wait for click if i don't wrap it inside an anonymous function? it's impossible to remove later.
+    activateShuffle(fullList);                      //? doesn't remove, only adds.
     searchButton.addEventListener("click",() => makeSearch(fullList));
     nameSearch.addEventListener("keypress", (e) => {
         if (e.key === 'Enter') {
@@ -210,9 +272,8 @@ function getSingleTypeList() {
             const compatibleType1 = typeList.map((element) => element.pokemon);
             ddType2.addEventListener("change",() => get2ndSingleTypeList(compatibleType1));
             makeSearchSuggestions(compatibleType1);
-            randomButton.removeEventListener("click",() => takeFive(fullList), false);                 //?how to remove and replace event listener???? neither of these work
-            randomButton.removeEventListener("click", () => takeFive(fullList), true);
-            randomButton.addEventListener("click",() => takeFive(compatibleType1));
+            // activateShuffle(compatibleType1);                   //? doesn't remove, only adds.
+            // randomButton.addEventListener("click", function activateShuffle(){ takeFive(compatibleType1)});       //? initializing function doesn't work either...
 
             // const buttonClone = randomButton.cloneNode(true);
             // randomButton.remove();
