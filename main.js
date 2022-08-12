@@ -240,34 +240,42 @@ function createCard(singlePoke) {
     spriteCheckbox2Label.for = "back";
     spriteCheckbox2Label.innerHTML = "testing2"
     spriteFilterSection.innerHTML = "Show only: ";
-    
-    
     const spriteDisplay = document.createElement("div");
-    spriteDisplay.setAttribute("style", "display: flex; gap: 1em; justify-content: space-between; width: 100%; overflow-x: scroll; border: solid 2px black;");
-    const gensArray = [];
-    const sprites = Object.entries(singlePoke.sprites.versions);
-        for (let i = 0; i < sprites.length; i++) {
-            const genGameList = Object.entries(sprites[i][1]);
-            // console.log("genGameList :>> ", genGameList)
-            for (let j = 0; j < genGameList.length; j++) {
-                const genGameCollection = genGameList[i][1];
-                for (let k = 0; k < genGameCollection.length; k++) {
-                    console.log("genGameCollection :>> ", genGameCollection)
-                    // const spriteImg  = document.createElement("img");
-                    // spriteImg.setAttribute("src", genGameCollection[i])
-                }
-            }
+    spriteDisplay.setAttribute("style", "display: flex; gap: 1em; justify-content: space-between; width: 100%; overflow-x: scroll; border: solid 2px black; border-radius: 12px");
+    const sprites = Object.entries(singlePoke.sprites);
+    sprites.length = sprites.length -2;
+    for (let i = 0; i < sprites.length; i++) {
+        if (sprites[i][1] !== null) {
+            const spriteImg = document.createElement("img");
+            spriteImg.setAttribute("src", sprites[i][1], "alt", singlePoke.name)
+            spriteDisplay.appendChild(spriteImg);
         }
+    }
     
-    
-    
-    spriteDisplay.innerHTML = 
+
+    // const gamesArray = [];
+    // const versions = Object.entries(singlePoke.sprites.versions);
+    // console.log(versions);
+    // for (let i = 0; i < versions.length; i++) {
+    //     const generations = Object.entries(versions[i][1]);
+    //     for (let j = 0; j < generations.length; j++) {
+    //         if (generations[i] !== undefined) {
+    //             gamesArray.push(generations[i][1])
+    //         }
+    //     }
+    // }
+    // console.log("gamesArray :>> ", gamesArray);
+    // for (let i = 0; i < gamesArray.length; i++) {
+
+    // }  //*                    getting real sick of this API and its bullshit way of organizing itself
 
 
 
     spriteFilterSection.append(spriteCheckbox1, spriteCheckbox1Label, spriteCheckbox2, spriteCheckbox2Label);
     spriteHeader.append(spriteH3, spriteFilterSection, spriteDisplay)
     spriteSection.append(spriteHeader);
+
+
 
 
 
