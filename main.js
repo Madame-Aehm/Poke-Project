@@ -2,11 +2,12 @@ const body = document.querySelector("body");
 const cardContainer = document.getElementById("card-container");
 const buttonText = document.getElementById("showFilters");
 const hiddenSpan = document.getElementById("hidden-span");
+const spotForButton = document.getElementById("spot-for-button");
 const nameSearch = document.getElementById("poke-name-search");
 const dataList = document.getElementById("all-pokemon");
 const searchButton = document.getElementById("search-button");
 const clearButton = document.getElementById("clear");
-const randomButton = document.getElementById("show-random");
+// const randomButton = document.getElementById("show-random");
 const ddType1 = document.getElementById("type1");
 const ddType2 = document.getElementById("type2");
 const ddColour = document.getElementById("colour");
@@ -52,6 +53,11 @@ function fullFetch () {
 // }
 
 function makeSearchSuggestions(list) {
+    spotForButton.innerHTML = "";
+    const shuffleButton = document.createElement("button");
+    shuffleButton.innerHTML = "Shuffle!";
+    shuffleButton.addEventListener("click", () => takeFive(list));
+    spotForButton.appendChild(shuffleButton);
     dataList.innerHTML = "";
     for (let i = 0; i < list.length; i++) {
         const searchOption = document.createElement("option");
@@ -205,16 +211,8 @@ function takeFive (list) {
     }
 }
 
-function activateShuffle (list) {
-    const notAnotherFunction = () => takeFive(list); 
-    randomButton.removeEventListener("click", notAnotherFunction)
-    randomButton.addEventListener("click", notAnotherFunction);
-}
-
 function setEventListeners(fullList) {
     ddType1.addEventListener("change", () => reset(fullList));
-    // randomButton.addEventListener("click", takeFive(fullList));          //? why doesn't it wait for click if i don't wrap it inside an anonymous function? it's impossible to remove later.
-    activateShuffle(fullList);                      //? doesn't remove, only adds.
     searchButton.addEventListener("click",() => makeSearch(fullList));
     nameSearch.addEventListener("keypress", (e) => {
         if (e.key === 'Enter') {
