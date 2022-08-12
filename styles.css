@@ -16,6 +16,38 @@ h1 {
     color: #dc7475;
 }
 
+h3 {
+    color: #dc7475; 
+    margin-top: 0; 
+    margin-bottom: 0; 
+}
+
+table {
+    width: 100%;
+
+}
+
+tr:nth-child(even) {
+    background-color: #dc7475;
+    color: white;
+}
+
+th {
+    text-align: left;
+}
+
+td {
+    text-align: center;
+}
+
+ol {
+    margin: 0;
+}
+
+li {
+    color: black;
+}
+
 .pokeball {
     width: 200px;
     padding-top: 10px;
