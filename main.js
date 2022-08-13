@@ -9,11 +9,7 @@ const searchButton = document.getElementById("search-button");
 const clearButton = document.getElementById("clear");
 const ddType1 = document.getElementById("type1");
 const ddType2 = document.getElementById("type2");
-const ddColour = document.getElementById("colour");
-const ddMega = document.getElementById("mega");
 const allSelectors = document.querySelectorAll("select");
-const buttonPlacement = document.getElementById("show-random-placement");
-const variationsCheck = document.getElementById("variations");
 
 function showFilters () {
     if (hiddenSpan.style.display === "block") {
@@ -143,7 +139,6 @@ function createCard(singlePoke) {
     const modalBackground = document.createElement("div");
     modalBackground.setAttribute("style", "display: none; position: fixed; top: 0; left: 0; z-index: 1; height: 100%; width: 100%; background-color: rgba(0,0,0,0.2);");
     const modal = document.createElement("div");
-    // modalBackground.addEventListener("click", () => modalBackground.style.display = "none");   //? need to specify not children of modelBackground....
     modal.setAttribute("style", "display: flex; flex-direction: column; margin: 1% auto; border: solid 2px black; border-radius: 12px; background-color: white; width: 70%; height: 90%; overflow-y: scroll; font-size: large;")
     
     const modalHeader = document.createElement("div");
@@ -159,18 +154,17 @@ function createCard(singlePoke) {
     h1.innerHTML = singlePoke.name;
     
     const modalContent1 = document.createElement("div");
-    modalContent1.setAttribute("style", "display: flex; flex-flow: row wrap; justify-content: space-around;");
+    modalContent1.setAttribute("style", "display: flex; flex-flow: row wrap; justify-content: space-evenly;");
     const imgDiv = document.createElement("div");
-    imgDiv.style.width = "50%";
     const mainImg = document.createElement("img");
     if (singlePoke.sprites.other["official-artwork"].front_default === null) {
         mainImg.setAttribute("src", "assets/images/sleeping.png", "alt", "No image of " + singlePoke.name)
     } else {
         mainImg.setAttribute("src", singlePoke.sprites.other["official-artwork"].front_default, "alt", singlePoke.name);
     }
-    mainImg.style.maxWidth = "100%";
+    mainImg.setAttribute("style", "max-width:100%; max-height: 340px");
     const content1Right = document.createElement("div");
-    content1Right.setAttribute("style", "width: 50%; display: flex; flex-direction: column; gap: 1em; padding-top: 5%");
+    content1Right.setAttribute("style", "display: flex; flex-direction: column; gap: 1em; padding-top: 5%");
     const typeLine = document.createElement("div");
     typeLine.setAttribute("style", "display: flex; gap: 1em;")
     const typesH3 = document.createElement("h3");
@@ -224,7 +218,7 @@ function createCard(singlePoke) {
     }
 
     const spriteSection = document.createElement("div");
-    spriteSection.style.padding = "1em";
+    spriteSection.setAttribute("style", "padding-left: 1em; padding-right: 1em;");
     const spriteHeader = document.createElement("div");
     const spriteH3 = document.createElement("h3");
     spriteH3.innerHTML = "Sprites: ";
@@ -241,33 +235,49 @@ function createCard(singlePoke) {
     spriteCheckbox2Label.innerHTML = "testing2"
     spriteFilterSection.innerHTML = "Show only: ";
     const spriteDisplay = document.createElement("div");
-    spriteDisplay.setAttribute("style", "display: flex; gap: 1em; justify-content: space-between; width: 100%; overflow-x: scroll; border: solid 2px black; border-radius: 12px");
-    const sprites = Object.entries(singlePoke.sprites);
-    sprites.length = sprites.length -2;
-    for (let i = 0; i < sprites.length; i++) {
-        if (sprites[i][1] !== null) {
-            const spriteImg = document.createElement("img");
-            spriteImg.setAttribute("src", sprites[i][1], "alt", singlePoke.name)
-            spriteDisplay.appendChild(spriteImg);
+    spriteDisplay.setAttribute("style", "display: flex; flex-flow: row no-wrap; align-items: center; justify-content: space-between; width: 100%; overflow-x: scroll; border: solid 2px black; border-radius: 12px");
+    
+    const defaultSprites = Object.values(singlePoke.sprites);
+    defaultSprites.length = defaultSprites.length -2;
+    const redBlue = Object.values(singlePoke.sprites.versions["generation-i"]["red-blue"]);
+    const yellow = Object.values(singlePoke.sprites.versions["generation-i"].yellow);
+    const crystal = Object.values(singlePoke.sprites.versions["generation-ii"].crystal);
+    const gold = Object.values(singlePoke.sprites.versions["generation-ii"].gold);
+    const silver = Object.values(singlePoke.sprites.versions["generation-ii"].silver);
+    const emerald = Object.values(singlePoke.sprites.versions["generation-iii"].emerald);
+    const fireRedLeafGreen = Object.values(singlePoke.sprites.versions["generation-iii"]["firered-leafgreen"]);
+    const rubySapphire = Object.values(singlePoke.sprites.versions["generation-iii"]["ruby-sapphire"]);
+    const diamondPearl = Object.values(singlePoke.sprites.versions["generation-iv"]["diamond-pearl"]);
+    const heartGoldSoulSilver = Object.values(singlePoke.sprites.versions["generation-iv"]["heartgold-soulsilver"]);
+    const platinum = Object.values(singlePoke.sprites.versions["generation-iv"].platinum);
+    const blackWhite = Object.values(singlePoke.sprites.versions["generation-v"]["black-white"]);
+    const blackWhiteAnimated = Object.values(blackWhite.shift());
+    const omegaRubyAlphaSapphire = Object.values(singlePoke.sprites.versions["generation-vi"]["omegaruby-alphasapphire"]);
+    const xY = Object.values(singlePoke.sprites.versions["generation-vi"]["x-y"]);
+    const ultraSunUltraMoon = Object.values(singlePoke.sprites.versions["generation-vii"]["ultra-sun-ultra-moon"]);
+    const icons = Object.values(singlePoke.sprites.versions["generation-viii"].icons);
+
+    const allGameSprites = [].concat(defaultSprites, redBlue, yellow, crystal, gold, silver, emerald, fireRedLeafGreen, rubySapphire, diamondPearl, heartGoldSoulSilver, platinum, blackWhite, blackWhiteAnimated, omegaRubyAlphaSapphire, xY, ultraSunUltraMoon, icons);
+    // console.log(allGameSprites);
+
+
+    for (let i = 0; i < allGameSprites.length; i++) {
+        if (allGameSprites[i] !== null) {
+                const spriteImg = document.createElement("img");
+                spriteImg.setAttribute("src", allGameSprites[i], "alt", singlePoke.name);
+                spriteDisplay.appendChild(spriteImg);
+                spriteImg.onload = () => {
+                
+                    if (spriteImg.width < 128) {
+                        let difference = 128 - spriteImg.width;
+                        difference = difference / 2 + "px";
+                        spriteImg.style.margin = difference;
+                    }
+                }
         }
     }
-    
 
-    // const gamesArray = [];
-    // const versions = Object.entries(singlePoke.sprites.versions);
-    // console.log(versions);
-    // for (let i = 0; i < versions.length; i++) {
-    //     const generations = Object.entries(versions[i][1]);
-    //     for (let j = 0; j < generations.length; j++) {
-    //         if (generations[i] !== undefined) {
-    //             gamesArray.push(generations[i][1])
-    //         }
-    //     }
-    // }
-    // console.log("gamesArray :>> ", gamesArray);
-    // for (let i = 0; i < gamesArray.length; i++) {
 
-    // }  //*                    getting real sick of this API and its bullshit way of organizing itself
 
 
 
@@ -276,7 +286,10 @@ function createCard(singlePoke) {
     spriteSection.append(spriteHeader);
 
 
-
+    const closeModelButton = document.createElement("button");
+    closeModelButton.setAttribute("style", "align-self: center; margin: 0.5em;")
+    closeModelButton.innerHTML = "Close";
+    closeModelButton.addEventListener("click", () => modalBackground.style.display = "none");
 
 
     abilitiesLine.append(abilitiesH3, abilitiesList)
@@ -289,13 +302,23 @@ function createCard(singlePoke) {
     imgDiv.appendChild(mainImg);
     modalContent1.append(imgDiv, content1Right);
     modalHeader.append(close, h1);
-    modal.append(modalHeader, modalContent1, spriteSection);
+    modal.append(modalHeader, modalContent1, spriteSection, closeModelButton);
     modalBackground.appendChild(modal);
     body.appendChild(modalBackground);
 
     cardDiv.addEventListener("click", () => {
         modalBackground.style.display = "block";
     })
+}
+
+function createSprite(spriteURL) {
+    const spriteImg = document.createElement("img");
+    spriteImg.setAttribute("src", spriteURL, "alt", singlePoke.name);
+            // if (spriteImg.style.width < "128px") {
+            //     const difference = 128 - spriteImg.display.width;
+            //     spriteImg.style.padding = difference;
+            // }
+            spriteDisplay.appendChild(spriteImg);
 }
 
 function takeFive (list) {
