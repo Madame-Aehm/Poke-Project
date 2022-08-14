@@ -269,6 +269,20 @@ function createCard(singlePoke) {
         moveSelectOption.innerHTML = singlePoke.moves[i].move.name;
         movesFilter1.appendChild(moveSelectOption);
     }
+    movesFilter1.addEventListener("change", () => {
+            if (movesFilter1.value === "") {
+                fillMovesTable(singlePoke.moves);
+            } else {
+                const matchArray = [];
+                for (let i = 0; i < singlePoke.moves.length; i++) {
+                    if (movesFilter1.value === singlePoke.moves[i].move.name) {
+                        matchArray.push(singlePoke.moves[i]);
+                        console.log(matchArray);
+                        fillMovesTable(matchArray);
+                    }
+                }
+            }    
+        });
 
     //*   fill game filter select
     const versionGroupDetails = [];
@@ -283,6 +297,70 @@ function createCard(singlePoke) {
         gameSelectOption.value = featuredGames[i];
         gameSelectOption.innerHTML = featuredGames[i];
         movesFilter2.appendChild(gameSelectOption);
+    }
+    movesFilter2.addEventListener("change", () => {
+        const matchArray = [];
+        for (let i = 0; i < singlePoke.moves.length; i++) {
+            for (let j = 0; j < singlePoke.moves[i].version_group_details.length; j++) {
+                if (movesFilter2.value === singlePoke.moves[i].version_group_details[j].version_group.name) {
+                    matchArray.push(singlePoke.moves[i]);
+                }
+            }
+        }
+        fillTableGameFilter(matchArray);
+    });
+
+    function fillTableGameFilter (moveArray) {
+        movesTable.innerHTML = ""
+        createMoveTableHeaders();
+        for (let i = 0; i < moveArray.length; i++) {
+            const newMove = document.createElement("tr");
+            movesTable.appendChild(newMove);
+            const moveName = document.createElement("td");
+            moveName.innerHTML = moveArray[i].move.name;
+            moveName.style.verticalAlign = "top";
+            newMove.appendChild(moveName);
+            const verGroupMatches = [];
+            for (let j = 0; j < moveArray[i].version_group_details.length; j++) {
+                if (movesFilter2.value === moveArray[i].version_group_details[j].version_group.name) {
+                    verGroupMatches.push(moveArray[i]);
+                    // const moveVer = document.createElement("td");
+                    // moveVer.innerHTML = moveArray[i].version_group_details[j].version_group.name;
+                    // const moveMethod = document.createElement("td");
+                    // if (moveArray[i].version_group_details[j].move_learn_method.name === "level-up") {
+                    //     moveMethod.innerHTML = moveArray[i].version_group_details[j].move_learn_method.name + " (lvl " + moveArray[i].version_group_details[j].level_learned_at + ")";
+                    // } else { 
+                    //     moveMethod.innerHTML = moveArray[i].version_group_details[j].move_learn_method.name;
+                    // }
+                    // newMove.append(moveVer, moveMethod);
+                }
+            } 
+            console.log(verGroupMatches);
+            if (verGroupMatches.length > 1) {
+                const rowSpanNumber = verGroupMatches.length;
+                moveName.rowSpan = rowSpanNumber;
+                const moveVer = document.createElement("td");
+                moveVer.innerHTML = verGroupMatches[0].version_group.name;
+                moveVer.rowSpan = rowSpanNumber;
+                newMove.appendChild(moveVer);
+                for (let j = 1; j < verGroupMatches.length; j++) {
+                    const nextRow = document.createElement("tr");
+                    const nextMethod = document.createElement("td");
+                    nextMethod.innerHTML = verGroupMatches[j].move_learn_method.name;
+
+                    nextRow.appendChild(nextMethod);
+                    movesTable.appendChild(nextRow);
+                }
+            } else {
+                const moveVer = document.createElement("td");
+                moveVer.innerHTML = verGroupMatches[0].version_group.name;
+                const moveMethod = document.createElement("td");
+                moveMethod.innerHTML = verGroupMatches[0].move_learn_method.name;
+
+                newMove.append(moveVer, moveMethod);
+
+            }
+        }
     }
 
     //*   fill method filter select
@@ -302,50 +380,56 @@ function createCard(singlePoke) {
 
 
 
-    
-
-
     const movesTable = document.createElement("table");
     movesTable.classList.add("moves-table");
-    const headings = document.createElement("tr");
-    const moveNameCol = document.createElement("th");
-    moveNameCol.innerHTML = "Move";
-    const gameVerCol = document.createElement("th");
-    gameVerCol.innerHTML = "Game";
-    const learnedByCol = document.createElement("th");
-    learnedByCol.innerHTML = "Method";
-    headings.append(moveNameCol, gameVerCol, learnedByCol);
-    movesTable.appendChild(headings);
-    for (let i = 0; i < singlePoke.moves.length; i++) {
-        const newMove = document.createElement("tr");
-        movesTable.appendChild(newMove);
-        const moveName = document.createElement("td");
-        moveName.innerHTML = singlePoke.moves[i].move.name;
-        const rowSpanNumber = singlePoke.moves[i].version_group_details.length;
-        moveName.rowSpan = rowSpanNumber;
-        moveName.style.verticalAlign = "top";
-        const moveVer = document.createElement("td");
-        moveVer.innerHTML = singlePoke.moves[i].version_group_details[0].version_group.name;
-        const learnedBy = document.createElement("td");
-        if (singlePoke.moves[i].version_group_details[0].move_learn_method.name === "level-up") {
-            learnedBy.innerHTML = singlePoke.moves[i].version_group_details[0].move_learn_method.name + " (lvl " + singlePoke.moves[i].version_group_details[0].level_learned_at + ")";
-        } else { 
-            learnedBy.innerHTML = singlePoke.moves[i].version_group_details[0].move_learn_method.name;
-        }
-        newMove.append(moveName, moveVer, learnedBy);
-        if (singlePoke.moves[i].version_group_details.length > 1) {
-            for (let j = 1; j < singlePoke.moves[i].version_group_details.length; j++) {
-                const nextRow = document.createElement("tr");
-                const nextVer = document.createElement("td");
-                nextVer.innerHTML = singlePoke.moves[i].version_group_details[j].version_group.name;
-                const nextMethod = document.createElement("td");
-                if (singlePoke.moves[i].version_group_details[j].move_learn_method.name === "level-up") {
-                    nextMethod.innerHTML = singlePoke.moves[i].version_group_details[j].move_learn_method.name + " (lvl " + singlePoke.moves[i].version_group_details[0].level_learned_at + ")";
-                } else { 
-                    nextMethod.innerHTML = singlePoke.moves[i].version_group_details[j].move_learn_method.name;
+    fillMovesTable(singlePoke.moves);
+
+    function createMoveTableHeaders () {
+        const headings = document.createElement("tr");
+        const moveNameCol = document.createElement("th");
+        moveNameCol.innerHTML = "Move";
+        const gameVerCol = document.createElement("th");
+        gameVerCol.innerHTML = "Game";
+        const learnedByCol = document.createElement("th");
+        learnedByCol.innerHTML = "Method";
+        headings.append(moveNameCol, gameVerCol, learnedByCol);
+        movesTable.appendChild(headings);
+    }
+
+    function fillMovesTable(moveArray) {
+        movesTable.innerHTML = ""
+        createMoveTableHeaders();
+        for (let i = 0; i < moveArray.length; i++) {
+            const newMove = document.createElement("tr");
+            movesTable.appendChild(newMove);
+            const moveName = document.createElement("td");
+            moveName.innerHTML = moveArray[i].move.name;
+            const rowSpanNumber = moveArray[i].version_group_details.length;
+            moveName.rowSpan = rowSpanNumber;
+            moveName.style.verticalAlign = "top";
+            const moveVer = document.createElement("td");
+            moveVer.innerHTML = moveArray[i].version_group_details[0].version_group.name;
+            const learnedBy = document.createElement("td");
+            if (moveArray[i].version_group_details[0].move_learn_method.name === "level-up") {
+                learnedBy.innerHTML = moveArray[i].version_group_details[0].move_learn_method.name + " (lvl " + moveArray[i].version_group_details[0].level_learned_at + ")";
+            } else { 
+                learnedBy.innerHTML = moveArray[i].version_group_details[0].move_learn_method.name;
+            }
+            newMove.append(moveName, moveVer, learnedBy);
+            if (moveArray[i].version_group_details.length > 1) {
+                for (let j = 1; j < moveArray[i].version_group_details.length; j++) {
+                    const nextRow = document.createElement("tr");
+                    const nextVer = document.createElement("td");
+                    nextVer.innerHTML = moveArray[i].version_group_details[j].version_group.name;
+                    const nextMethod = document.createElement("td");
+                    if (moveArray[i].version_group_details[j].move_learn_method.name === "level-up") {
+                        nextMethod.innerHTML = moveArray[i].version_group_details[j].move_learn_method.name + " (lvl " + moveArray[i].version_group_details[j].level_learned_at + ")";
+                    } else { 
+                        nextMethod.innerHTML = moveArray[i].version_group_details[j].move_learn_method.name;
+                    }
+                    nextRow.append(nextVer, nextMethod);
+                    movesTable.appendChild(nextRow);
                 }
-                nextRow.append(nextVer, nextMethod);
-                movesTable.appendChild(nextRow);
             }
         }
     }
