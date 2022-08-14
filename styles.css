@@ -22,32 +22,6 @@ h3 {
     margin-bottom: 0; 
 }
 
-table {
-    width: 100%;
-
-}
-
-tr:nth-child(even) {
-    background-color: #dc7475;
-    color: white;
-}
-
-th {
-    text-align: left;
-}
-
-td {
-    text-align: center;
-}
-
-ol {
-    margin: 0;
-}
-
-li {
-    color: black;
-}
-
 .pokeball {
     width: 200px;
     padding-top: 10px;
@@ -99,7 +73,7 @@ li {
     padding: 0.5em;
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
-    width: 100%;
+    max-width: 100%;
     margin-top: 0.5em
 }
 
@@ -157,10 +131,50 @@ button:active {
     border: solid 2px black;
     border-radius: 12px;
     min-height: 130px;
+    max-width: 100%;
+}
+
+.stats-table {
     width: 100%;
 }
 
-@media only screen and (max-width: 650px) {
+.stats-table tr:nth-child(even) {
+    background-color: #dc7475;
+    color: white;
+}
 
+.stats-table th {
+    text-align: left;
+}
+
+.stats-table td {
+    text-align: center;
+}
+
+ol {
+    margin: 0;
+}
+
+.moves-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.moves-table th {
+    color: white;
+    background-color: #dc7475;
+    border: solid 2px #dc7475;
+}
+
+.moves-table td {
+    border: solid 2px #dc7475;
+    padding: 0.5em;
+    text-align: center;
+}
+
+@media only screen and (max-width: 650px) {
+    #container {
+        width: 95%;
+    }
 }
 
