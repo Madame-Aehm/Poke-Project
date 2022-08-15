@@ -259,8 +259,9 @@ function createCard(singlePoke) {
     h1.innerHTML = singlePoke.name;
     
     const modalContent1 = document.createElement("div");
-    modalContent1.setAttribute("style", "display: flex; flex-flow: row wrap; justify-content: space-evenly; align-items: center;");
+    modalContent1.setAttribute("style", "display: flex; flex-flow: row wrap; justify-content: space-evenly;");
     const imgDiv = document.createElement("div");
+    imgDiv.style.alignSelf = "center";
     const mainImg = document.createElement("img");
     if (singlePoke.sprites.other["official-artwork"].front_default === null) {
         mainImg.setAttribute("src", "assets/images/sleeping.png", "alt", "No image of " + singlePoke.name)
@@ -273,7 +274,7 @@ function createCard(singlePoke) {
     const contentWrapper = document.createElement("div");
     contentWrapper.style.margin = "1em";
     const content = document.createElement("div");
-    content.setAttribute("style", "display: flex; flex-direction: column; gap: 1em; padding: 0.5em; border: solid 2px black; border-radius: 12px; min-height: 100%;");
+    content.setAttribute("style", "display: flex; flex-direction: column; gap: 1.6em; padding: 0.5em; border: solid 2px black; border-radius: 12px;");
     const contentH3 = document.createElement("h3");
     contentH3.innerHTML = "Summary: "
     const typeLine = document.createElement("div");
@@ -371,18 +372,18 @@ function createCard(singlePoke) {
         movesFilter1.appendChild(moveSelectOption);
     }
     movesFilter1.addEventListener("change", () => {
-            if (movesFilter1.value === "") {
-                fillMovesTable(singlePoke.moves);
-            } else {
-                const matchArray = [];
-                for (let i = 0; i < singlePoke.moves.length; i++) {
-                    if (movesFilter1.value === singlePoke.moves[i].move.name) {
-                        matchArray.push(singlePoke.moves[i]);
-                        fillMovesTable(matchArray);
-                    }
+        if (movesFilter1.value === "") {
+            fillMovesTable(singlePoke.moves);
+        } else {
+            const matchArray = [];
+            for (let i = 0; i < singlePoke.moves.length; i++) {
+                if (movesFilter1.value === singlePoke.moves[i].move.name) {
+                    matchArray.push(singlePoke.moves[i]);
+                    fillMovesTable(matchArray);
                 }
-            }    
-        });
+            }
+        }    
+    });
 
     //*   fill game filter select
     const versionGroupDetails = [];
@@ -392,10 +393,12 @@ function createCard(singlePoke) {
         }
     }
     const featuredGames = [...new Set(versionGroupDetails)];
+    console.log(featuredGames);
     for (let i = 0; i < featuredGames.length; i++) {
+        const forDisplay = displayGameNames(featuredGames[i]);
         const gameSelectOption = document.createElement("option");
         gameSelectOption.value = featuredGames[i];
-        gameSelectOption.innerHTML = featuredGames[i];
+        gameSelectOption.innerHTML = forDisplay;
         movesFilter2.appendChild(gameSelectOption);
     }
     movesFilter2.addEventListener("change", () => {
@@ -435,7 +438,7 @@ function createCard(singlePoke) {
                         rowSpanNumber = rowSpanNumber + 1;
                         moveName.rowSpan = rowSpanNumber;
                         const moveVer = document.createElement("td");
-                        moveVer.innerHTML = moveArray[i].version_group_details[j].version_group.name;
+                        moveVer.innerHTML = displayGameNames(moveArray[i].version_group_details[j].version_group.name);
                         const moveMethod = document.createElement("td");
                         if (moveArray[i].version_group_details[j].move_learn_method.name === "level-up") {
                             moveMethod.innerHTML = moveArray[i].version_group_details[j].move_learn_method.name + " (lvl " + moveArray[i].version_group_details[j].level_learned_at + ")";
@@ -445,7 +448,7 @@ function createCard(singlePoke) {
                         newRow.append(moveVer, moveMethod);
                     } else { 
                         const moveVer = document.createElement("td");
-                        moveVer.innerHTML = moveArray[i].version_group_details[j].version_group.name;
+                        moveVer.innerHTML = displayGameNames(moveArray[i].version_group_details[j].version_group.name);
                         const moveMethod = document.createElement("td");
                         if (moveArray[i].version_group_details[j].move_learn_method.name === "level-up") {
                             moveMethod.innerHTML = moveArray[i].version_group_details[j].move_learn_method.name + " (lvl " + moveArray[i].version_group_details[j].level_learned_at + ")";
@@ -496,11 +499,9 @@ function createCard(singlePoke) {
             movesTable.appendChild(newMove);
             const moveName = document.createElement("td");
             moveName.innerHTML = moveArray[i].move.name;
-            // const rowSpanNumber = moveArray[i].version_group_details.length;
-            // moveName.rowSpan = rowSpanNumber;
             moveName.style.verticalAlign = "top";
             const moveVer = document.createElement("td");
-            moveVer.innerHTML = moveArray[i].version_group_details[0].version_group.name;
+            moveVer.innerHTML = displayGameNames(moveArray[i].version_group_details[0].version_group.name);
             const learnedBy = document.createElement("td");
             if (moveArray[i].version_group_details[0].move_learn_method.name === "level-up") {
                 learnedBy.innerHTML = moveArray[i].version_group_details[0].move_learn_method.name + " (lvl " + moveArray[i].version_group_details[0].level_learned_at + ")";
@@ -515,7 +516,7 @@ function createCard(singlePoke) {
                     moveName.rowSpan = rowSpanNumber;
                     const nextRow = document.createElement("tr");
                     const nextVer = document.createElement("td");
-                    nextVer.innerHTML = moveArray[i].version_group_details[j].version_group.name;
+                    nextVer.innerHTML = displayGameNames(moveArray[i].version_group_details[j].version_group.name);
                     const nextMethod = document.createElement("td");
                     if (moveArray[i].version_group_details[j].move_learn_method.name === "level-up") {
                         nextMethod.innerHTML = moveArray[i].version_group_details[j].move_learn_method.name + " (lvl " + moveArray[i].version_group_details[j].level_learned_at + ")";
@@ -620,4 +621,74 @@ function createCard(singlePoke) {
     cardDiv.addEventListener("click", () => {
         modalBackground.style.display = "block";
     })
+}
+
+function displayNicely(string) {
+    
+}
+
+function displayGameNames(gameName) {
+    if (gameName === "red-blue") {
+        return "Red/Blue";
+    }
+    if (gameName === "yellow") {
+        return "Yellow";
+    }
+    if (gameName === "gold-silver") {
+        return "Gold/Silver";
+    }
+    if (gameName === "crystal") {
+        return "Crystal";
+    }
+    if (gameName === "emerald") {
+        return "Emerald";
+    }
+    if (gameName === "firered-leafgreen") {
+        return "Fire Red/Leaf Green";
+    } 
+    if (gameName === "diamond-pearl") {
+        return "Diamond/Pearl";
+    }
+    if (gameName === "platinum") {
+        return "Platinum";
+    }
+    if (gameName === "heartgold-soulsilver") {
+        return "Heart Gold/Soul Silver";
+    }
+    if (gameName === "black-white") {
+        return "Black/White";
+    }
+    if (gameName === "black-2-white-2") {
+        return "Black 2/White 2";
+    }
+    if (gameName === "x-y") {
+        return "X/Y";
+    }
+    if (gameName === "omega-ruby-alpha-sapphire") {
+        return "Omega Ruby/Alpha Sapphire";
+    }
+    if (gameName === "sun-moon") {
+        return "Sun/Moon";
+    }
+    if (gameName === "ultra-sun-ultra-moon") {
+        return "Ultra Sun/Ultra Moon";
+    }
+    if (gameName === "sword-shield") {
+        return "Sword/Shield";
+    }
+    if (gameName === "sword-shield") {
+        return "Sword/Shield";
+    }
+    if (gameName === "ruby-sapphire") {
+        return "Ruby/Sapphire";
+    }
+    if (gameName === "colosseum") {
+        return "Colosseum";
+    }
+    if (gameName === "xd") {
+        return "XD";
+    }
+    if (gameName === "lets-go-pikachu-lets-go-eevee") {
+        return "Let's Go Pikachu/Let's Go Eevee";
+    }
 }
