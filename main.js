@@ -35,9 +35,17 @@ function fullFetch () {
     }).catch((error)=>{console.log(error)}) 
 }
 
+fullFetch();
+
 function fullListController (fullList) {
     reset(fullList);
     setEventListeners(fullList)
+}
+
+function reset (fullList) {
+    if (ddType1.value === "") {
+        makeSearchSuggestions(fullList);
+    }
 }
 
 function setEventListeners(fullList) {
@@ -58,6 +66,19 @@ function removeExistingData (){
     fullList.sort(() => Math.random() - 0.5);
 }
 
+function takeFive (list) {
+    removeExistingData()
+    const newArray = [];
+    for (let i = 0; i < list.length; i++) {
+        newArray.push(list[i])
+    }
+    shuffleList(newArray);
+    for (let i = 0; i < 5; i++) {
+        let singleURL = newArray[i].url;
+        fetchSinglePoke(singleURL);
+    }
+}
+
 // const  fetchSingleUrl = (URLarray) => {
 //     Promise.all(URLarray.map(url=> fetch(url).then((response)=>response.json()))).then((result)=> console.log('result :>> ', result))
 // }
@@ -75,30 +96,22 @@ function makeSearchSuggestions(list) {
         searchOption.innerHTML = list[i].name;
         dataList.appendChild(searchOption);
     }
-    console.log(list);
-}
-
-function reset (fullList) {
-    if (ddType1.value === "") {
-        makeSearchSuggestions(fullList);
-    }
 }
 
 function makeSearch (list) {
     // let enteredText = nameSearch.value;
     // enteredText.trim();                                                         //? want to incorporate this somehow
     let found = "";
-        for (let i = 0; i < list.length; i++) {
-                if (list[i].name === nameSearch.value) {
-                    found = "match found";
-                    removeExistingData();
-                    fetchSinglePoke(list[i].url);
-                    break;
-                } else {
-                    noMonHere();
-                }
-            }
-    
+    for (let i = 0; i < list.length; i++) {
+        if (list[i].name === nameSearch.value) {
+            found = "match found";
+            removeExistingData();
+            fetchSinglePoke(list[i].url);
+            break;
+        } else {
+            noMonHere();
+        }
+    }
 }
 
 function noMonHere() {
@@ -112,7 +125,6 @@ function noMonHere() {
     const noMonImg = document.createElement("img");
     noMonImg.setAttribute("src", "assets/images/no-mon-home.png", "alt", "Empty PokeBall");
     cardDiv.appendChild(noMonImg);
-
 }
 
 function fetchSinglePoke (pokeURL) {
@@ -124,6 +136,91 @@ function fetchSinglePoke (pokeURL) {
         createCard(singlePoke);
         return singlePoke;
     }).catch((error)=>{console.log(error)})
+}
+
+//* /////////////////////// add type filters /////////////////////////////
+
+function typesFetch() {
+    fetch("https://pokeapi.co/api/v2/type/").then((response) => response.json())
+    .then((result) => {
+        const typesList = result.results
+        typesController(typesList)
+        return typesList;
+    }).catch((error)=>{console.log(error)}) 
+}
+
+typesFetch();
+
+function typesController(typesList) {
+    ddFillType1(typesList);
+    addTypeEL(typesList);
+}
+
+function ddFillType1(typesList) {
+        for (let i = 0; i < typesList.length; i++) {
+            const option = document.createElement("option");
+            option.setAttribute("value", typesList[i].name);
+            option.innerHTML = typesList[i].name;
+            ddType1.appendChild(option);
+        }
+}
+
+function addTypeEL(typesList) {
+    ddType1.addEventListener("change",() => {
+        getSingleTypeList();
+        ddFillType2(typesList);
+    });
+}
+
+function getSingleTypeList() {
+    if (ddType1.value) {
+        let pokemonName = ddType1.value;
+        fetch(`https://pokeapi.co/api/v2/type/${pokemonName}/`).then((response) => response.json())
+        .then((result) => {
+            const typeList = result.pokemon;
+            const compatibleType1 = typeList.map((element) => element.pokemon);
+            ddType2.addEventListener("change",() => get2ndSingleTypeList(compatibleType1));
+            makeSearchSuggestions(compatibleType1);
+        }).catch((error)=>{console.log(error)}); 
+    }
+}
+
+function get2ndSingleTypeList(type1List) {
+    if (ddType1.value && ddType2.value) {
+        let pokemonName = ddType2.value;
+        fetch(`https://pokeapi.co/api/v2/type/${pokemonName}/`).then((response) => response.json())
+        .then((result) => {
+            const type2List = result.pokemon
+            const compatibleType2 = type2List.map((element)=> {
+                return element.pokemon
+            });
+            const combinedList = [...type1List, ...compatibleType2];
+            const duplicateNames = combinedList.map(e => e.name).filter((e, i, array) => array.indexOf(e) !==i);
+            const duplicatesArray = combinedList.filter(e => duplicateNames.includes(e.name));
+            const duelTypesList = duplicatesArray.map(e => e["name"])
+            .map((e, i, final) => final.indexOf(e) === i && i)                          //* store the keys of the unique objects
+            .filter(e => duplicatesArray[e]).map(e => duplicatesArray[e]);              //* eliminate the dead keys & store unique objects
+            makeSearchSuggestions(duelTypesList);
+        }).catch((error)=>{console.log(error)})
+    }
+}
+
+function ddFillType2(typesList) {  
+        ddType2.options.length = 1;
+        const editedList = [];
+        for (let i = 0; i < typesList.length; i++) {
+            if (typesList[i].name !== ddType1.value) {
+            editedList.push(typesList[i])
+            }
+        }
+        if (ddType1.value !== "") {
+            for (let i = 0; i < editedList.length; i++) {
+                const option = document.createElement("option");
+                option.setAttribute("value", editedList[i].name);
+                option.innerHTML = editedList[i].name;
+                ddType2.appendChild(option);
+            }
+        }
 }
 
 function createCard(singlePoke) {
@@ -262,6 +359,10 @@ function createCard(singlePoke) {
     movesFilter3FirstValue.innerHTML = "Select Method...";
     movesFilter3.appendChild(movesFilter3FirstValue);
 
+    const movesTable = document.createElement("table");
+    movesTable.classList.add("moves-table");
+    fillMovesTable(singlePoke.moves);
+
     //*   fill move filter select
     for (let i = 0; i < singlePoke.moves.length; i++) {
         const moveSelectOption = document.createElement("option");
@@ -277,7 +378,6 @@ function createCard(singlePoke) {
                 for (let i = 0; i < singlePoke.moves.length; i++) {
                     if (movesFilter1.value === singlePoke.moves[i].move.name) {
                         matchArray.push(singlePoke.moves[i]);
-                        console.log(matchArray);
                         fillMovesTable(matchArray);
                     }
                 }
@@ -299,15 +399,19 @@ function createCard(singlePoke) {
         movesFilter2.appendChild(gameSelectOption);
     }
     movesFilter2.addEventListener("change", () => {
-        const matchArray = [];
-        for (let i = 0; i < singlePoke.moves.length; i++) {
-            for (let j = 0; j < singlePoke.moves[i].version_group_details.length; j++) {
-                if (movesFilter2.value === singlePoke.moves[i].version_group_details[j].version_group.name) {
-                    matchArray.push(singlePoke.moves[i]);
+        if (movesFilter2.value === "") {
+            fillMovesTable(singlePoke.moves);
+        } else {
+            const matchArray = [];
+            for (let i = 0; i < singlePoke.moves.length; i++) {
+                for (let j = 0; j < singlePoke.moves[i].version_group_details.length; j++) {
+                    if (movesFilter2.value === singlePoke.moves[i].version_group_details[j].version_group.name) {
+                        matchArray.push(singlePoke.moves[i]);
+                    }
                 }
             }
-        }
-        fillTableGameFilter(matchArray);
+            fillTableGameFilter(matchArray);
+        } 
     });
 
     function fillTableGameFilter (moveArray) {
@@ -318,50 +422,43 @@ function createCard(singlePoke) {
             movesTable.appendChild(newMove);
             const moveName = document.createElement("td");
             moveName.innerHTML = moveArray[i].move.name;
-            moveName.style.verticalAlign = "top";
             newMove.appendChild(moveName);
-            const verGroupMatches = [];
+
+            const test = [];
             for (let j = 0; j < moveArray[i].version_group_details.length; j++) {
                 if (movesFilter2.value === moveArray[i].version_group_details[j].version_group.name) {
-                    verGroupMatches.push(moveArray[i]);
-                    // const moveVer = document.createElement("td");
-                    // moveVer.innerHTML = moveArray[i].version_group_details[j].version_group.name;
-                    // const moveMethod = document.createElement("td");
-                    // if (moveArray[i].version_group_details[j].move_learn_method.name === "level-up") {
-                    //     moveMethod.innerHTML = moveArray[i].version_group_details[j].move_learn_method.name + " (lvl " + moveArray[i].version_group_details[j].level_learned_at + ")";
-                    // } else { 
-                    //     moveMethod.innerHTML = moveArray[i].version_group_details[j].move_learn_method.name;
-                    // }
-                    // newMove.append(moveVer, moveMethod);
+                    test.push(moveArray[i].version_group_details[j].version_group.name)
+                    if (test.length > 1) {
+                        const newRow = document.createElement("tr");
+                        movesTable.appendChild(newRow);
+                        let rowSpanNumber = moveName.rowSpan;
+                        rowSpanNumber = rowSpanNumber + 1;
+                        moveName.rowSpan = rowSpanNumber;
+                        const moveVer = document.createElement("td");
+                        moveVer.innerHTML = moveArray[i].version_group_details[j].version_group.name;
+                        const moveMethod = document.createElement("td");
+                        if (moveArray[i].version_group_details[j].move_learn_method.name === "level-up") {
+                            moveMethod.innerHTML = moveArray[i].version_group_details[j].move_learn_method.name + " (lvl " + moveArray[i].version_group_details[j].level_learned_at + ")";
+                        } else { 
+                            moveMethod.innerHTML = moveArray[i].version_group_details[j].move_learn_method.name;
+                        }
+                        newRow.append(moveVer, moveMethod);
+                    } else { 
+                        const moveVer = document.createElement("td");
+                        moveVer.innerHTML = moveArray[i].version_group_details[j].version_group.name;
+                        const moveMethod = document.createElement("td");
+                        if (moveArray[i].version_group_details[j].move_learn_method.name === "level-up") {
+                            moveMethod.innerHTML = moveArray[i].version_group_details[j].move_learn_method.name + " (lvl " + moveArray[i].version_group_details[j].level_learned_at + ")";
+                        } else { 
+                            moveMethod.innerHTML = moveArray[i].version_group_details[j].move_learn_method.name;
+                        }
+                        newMove.append(moveVer, moveMethod);
+                    }
                 }
-            } 
-            console.log(verGroupMatches);
-            if (verGroupMatches.length > 1) {
-                const rowSpanNumber = verGroupMatches.length;
-                moveName.rowSpan = rowSpanNumber;
-                const moveVer = document.createElement("td");
-                moveVer.innerHTML = verGroupMatches[0].version_group.name;
-                moveVer.rowSpan = rowSpanNumber;
-                newMove.appendChild(moveVer);
-                for (let j = 1; j < verGroupMatches.length; j++) {
-                    const nextRow = document.createElement("tr");
-                    const nextMethod = document.createElement("td");
-                    nextMethod.innerHTML = verGroupMatches[j].move_learn_method.name;
-
-                    nextRow.appendChild(nextMethod);
-                    movesTable.appendChild(nextRow);
-                }
-            } else {
-                const moveVer = document.createElement("td");
-                moveVer.innerHTML = verGroupMatches[0].version_group.name;
-                const moveMethod = document.createElement("td");
-                moveMethod.innerHTML = verGroupMatches[0].move_learn_method.name;
-
-                newMove.append(moveVer, moveMethod);
-
             }
         }
     }
+            
 
     //*   fill method filter select
     const moveLearnMethod = [];
@@ -378,11 +475,6 @@ function createCard(singlePoke) {
         movesFilter3.appendChild(methodSelectOption);
     }
 
-
-
-    const movesTable = document.createElement("table");
-    movesTable.classList.add("moves-table");
-    fillMovesTable(singlePoke.moves);
 
     function createMoveTableHeaders () {
         const headings = document.createElement("tr");
@@ -404,8 +496,8 @@ function createCard(singlePoke) {
             movesTable.appendChild(newMove);
             const moveName = document.createElement("td");
             moveName.innerHTML = moveArray[i].move.name;
-            const rowSpanNumber = moveArray[i].version_group_details.length;
-            moveName.rowSpan = rowSpanNumber;
+            // const rowSpanNumber = moveArray[i].version_group_details.length;
+            // moveName.rowSpan = rowSpanNumber;
             moveName.style.verticalAlign = "top";
             const moveVer = document.createElement("td");
             moveVer.innerHTML = moveArray[i].version_group_details[0].version_group.name;
@@ -418,6 +510,9 @@ function createCard(singlePoke) {
             newMove.append(moveName, moveVer, learnedBy);
             if (moveArray[i].version_group_details.length > 1) {
                 for (let j = 1; j < moveArray[i].version_group_details.length; j++) {
+                    let rowSpanNumber = moveName.rowSpan;
+                    rowSpanNumber = rowSpanNumber + 1;
+                    moveName.rowSpan = rowSpanNumber;
                     const nextRow = document.createElement("tr");
                     const nextVer = document.createElement("td");
                     nextVer.innerHTML = moveArray[i].version_group_details[j].version_group.name;
@@ -526,141 +621,3 @@ function createCard(singlePoke) {
         modalBackground.style.display = "block";
     })
 }
-//*                                  modal construction end point                                            
-
-function takeFive (list) {
-    removeExistingData()
-    const newArray = [];
-    for (let i = 0; i < list.length; i++) {
-        newArray.push(list[i])
-    }
-    shuffleList(newArray);
-    for (let i = 0; i < 5; i++) {
-        let singleURL = newArray[i].url;
-        fetchSinglePoke(singleURL);
-    }
-}
-
-fullFetch();
-
-
-//* /////////////////////// add type filters /////////////////////////////
-
-function typesFetch() {
-    fetch("https://pokeapi.co/api/v2/type/").then((response) => response.json())
-    .then((result) => {
-        const typesList = result.results
-        typesController(typesList)
-        return typesList;
-    }).catch((error)=>{console.log(error)}) 
-}
-
-function typesController(typesList) {
-    ddFillType1(typesList);
-    addTypeEL(typesList);
-}
-
-function ddFillType1(typesList) {
-        for (let i = 0; i < typesList.length; i++) {
-            const option = document.createElement("option");
-            option.setAttribute("value", typesList[i].name);
-            option.innerHTML = typesList[i].name;
-            ddType1.appendChild(option);
-        }
-}
-
-function addTypeEL(typesList) {
-    ddType1.addEventListener("change",() => {
-        getSingleTypeList();
-        ddFillType2(typesList);
-    });
-}
-
-function getSingleTypeList() {
-    if (ddType1.value) {
-        let pokemonName = ddType1.value;
-        fetch(`https://pokeapi.co/api/v2/type/${pokemonName}/`).then((response) => response.json())
-        .then((result) => {
-            const typeList = result.pokemon;
-            const compatibleType1 = typeList.map((element) => element.pokemon);
-            ddType2.addEventListener("change",() => get2ndSingleTypeList(compatibleType1));
-            makeSearchSuggestions(compatibleType1);
-            // activateShuffle(compatibleType1);                   //? doesn't remove, only adds.
-            // randomButton.addEventListener("click", function activateShuffle(){ takeFive(compatibleType1)});       //? initializing function doesn't work either...
-
-            // const buttonClone = randomButton.cloneNode(true);
-            // randomButton.remove();
-            // buttonPlacement.appendChild(buttonClone);
-            // buttonClone.addEventListener("click",() => takeFive(compatibleType1));
-            // buttonClone = randomButton;
-
-            // randomButton.remove().clone().appendTo(buttonPlacement);
-            // randomButton.addEventListener("click", () => takeFive(compatibleType1))
-        }).catch((error)=>{console.log(error)}); 
-    }
-}
-
-function get2ndSingleTypeList(type1List) {
-    if (ddType1.value && ddType2.value) {
-        let pokemonName = ddType2.value;
-        fetch(`https://pokeapi.co/api/v2/type/${pokemonName}/`).then((response) => response.json())
-        .then((result) => {
-            const type2List = result.pokemon
-            const compatibleType2 = type2List.map((element)=> {
-                return element.pokemon
-            });
-            const combinedList = [...type1List, ...compatibleType2];
-            const duplicateNames = combinedList.map(e => e.name).filter((e, i, array) => array.indexOf(e) !==i);
-            const duplicatesArray = combinedList.filter(e => duplicateNames.includes(e.name));
-            const duelTypesList = duplicatesArray.map(e => e["name"])
-            .map((e, i, final) => final.indexOf(e) === i && i)                          //* store the keys of the unique objects
-            .filter(e => duplicatesArray[e]).map(e => duplicatesArray[e]);              //* eliminate the dead keys & store unique objects
-            makeSearchSuggestions(duelTypesList);
-        }).catch((error)=>{console.log(error)})
-    }
-}
-
-function ddFillType2(typesList) {  
-        ddType2.options.length = 1;
-        const editedList = [];
-        for (let i = 0; i < typesList.length; i++) {
-            if (typesList[i].name !== ddType1.value) {
-            editedList.push(typesList[i])
-            }
-        }
-        if (ddType1.value !== "") {
-            for (let i = 0; i < editedList.length; i++) {
-                const option = document.createElement("option");
-                option.setAttribute("value", editedList[i].name);
-                option.innerHTML = editedList[i].name;
-                ddType2.appendChild(option);
-            }
-        }
-}
-
-typesFetch();
-
-
-
-
-
-
-
-// function createPokeArray(pokeArray, singlePoke) {
-//     pokeArray.push(singlePoke);
-//     console.log(pokeArray);
-// }
-
-// function extractUrls (fullList){
-//     for (let i = 0; i < fullList.length; i++) {
-//         fetchSinglePokemon(fullList[i].url)
-//     }  
-// }
-
-// function fetchSinglePokemon (urlList) {
-//     fetch(urlList).then((response) => {
-//         return response.json()
-//     }).then((result) => {
-//         // console.log(result)
-//     })
-// }
