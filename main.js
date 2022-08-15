@@ -333,31 +333,34 @@ function createCard(singlePoke) {
     const movesDivWrapper = document.createElement("div");
     movesDivWrapper.style.margin = "1em";
     const movesDiv = document.createElement("div");
-    movesDiv.setAttribute("style", "overflow-y: scroll; max-width: 100%; max-height: 300px; padding: 0.5em; border: solid 2px black; border-radius: 12px;");
+    movesDiv.setAttribute("style", "overflow-y: scroll; max-width: 100%; height: 300px; padding: 0.5em; border: solid 2px black; border-radius: 12px;");
     const movesH3 = document.createElement("h3");
     movesH3.innerHTML = "Moves: ";
     const selectorsWrapper = document.createElement("span");
     selectorsWrapper.setAttribute("style", "display: flex; gap: 0.5em; padding-bottom: 0.5em;")
 
+    const or = document.createElement("span");
+    or.innerHTML = " or ";
+    or.style.alignSelf = "center";
     const movesFilterSection = document.createElement("div");
     movesFilterSection.innerHTML = "Filter by: ";
     const movesFilter1 = document.createElement("select");
     movesFilter1.setAttribute("id", "move", "name", "move");
     const movesFilter1FirstValue = document.createElement("option");
     movesFilter1FirstValue.value = "";
-    movesFilter1FirstValue.innerHTML = "Select Move...";
+    movesFilter1FirstValue.innerHTML = "Move...";
     movesFilter1.appendChild(movesFilter1FirstValue);
     const movesFilter2 = document.createElement("select");
     movesFilter2.setAttribute("id", "game", "name", "game");
     const movesFilter2FirstValue = document.createElement("option");
     movesFilter2FirstValue.value = "";
-    movesFilter2FirstValue.innerHTML = "Select Game...";
+    movesFilter2FirstValue.innerHTML = "Game...";
     movesFilter2.appendChild(movesFilter2FirstValue);
     const movesFilter3 = document.createElement("select");
     movesFilter3.setAttribute("id", "method", "name", "method");
     const movesFilter3FirstValue = document.createElement("option");
     movesFilter3FirstValue.value = "";
-    movesFilter3FirstValue.innerHTML = "Select Method...";
+    movesFilter3FirstValue.innerHTML = "Method...";
     movesFilter3.appendChild(movesFilter3FirstValue);
 
     const movesTable = document.createElement("table");
@@ -372,6 +375,8 @@ function createCard(singlePoke) {
         movesFilter1.appendChild(moveSelectOption);
     }
     movesFilter1.addEventListener("change", () => {
+        movesFilter2.value = "";
+        movesFilter3.value = "";
         if (movesFilter1.value === "") {
             fillMovesTable(singlePoke.moves);
         } else {
@@ -393,7 +398,6 @@ function createCard(singlePoke) {
         }
     }
     const featuredGames = [...new Set(versionGroupDetails)];
-    console.log(featuredGames);
     for (let i = 0; i < featuredGames.length; i++) {
         const forDisplay = displayGameNames(featuredGames[i]);
         const gameSelectOption = document.createElement("option");
@@ -402,66 +406,18 @@ function createCard(singlePoke) {
         movesFilter2.appendChild(gameSelectOption);
     }
     movesFilter2.addEventListener("change", () => {
-        if (movesFilter2.value === "") {
-            fillMovesTable(singlePoke.moves);
-        } else {
-            const matchArray = [];
-            for (let i = 0; i < singlePoke.moves.length; i++) {
-                for (let j = 0; j < singlePoke.moves[i].version_group_details.length; j++) {
-                    if (movesFilter2.value === singlePoke.moves[i].version_group_details[j].version_group.name) {
-                        matchArray.push(singlePoke.moves[i]);
-                    }
-                }
-            }
-            fillTableGameFilter(matchArray);
-        } 
-    });
-
-    function fillTableGameFilter (moveArray) {
-        movesTable.innerHTML = ""
+        movesFilter1.value = "";
+        movesTable.innerHTML = "";
         createMoveTableHeaders();
-        for (let i = 0; i < moveArray.length; i++) {
-            const newMove = document.createElement("tr");
-            movesTable.appendChild(newMove);
-            const moveName = document.createElement("td");
-            moveName.innerHTML = displayNicely(moveArray[i].move.name);
-            newMove.appendChild(moveName);
-
-            const test = [];
-            for (let j = 0; j < moveArray[i].version_group_details.length; j++) {
-                if (movesFilter2.value === moveArray[i].version_group_details[j].version_group.name) {
-                    test.push(moveArray[i].version_group_details[j].version_group.name)
-                    if (test.length > 1) {
-                        const newRow = document.createElement("tr");
-                        movesTable.appendChild(newRow);
-                        let rowSpanNumber = moveName.rowSpan;
-                        rowSpanNumber = rowSpanNumber + 1;
-                        moveName.rowSpan = rowSpanNumber;
-                        const moveVer = document.createElement("td");
-                        moveVer.innerHTML = displayGameNames(moveArray[i].version_group_details[j].version_group.name);
-                        const moveMethod = document.createElement("td");
-                        if (moveArray[i].version_group_details[j].move_learn_method.name === "level-up") {
-                            moveMethod.innerHTML = displayNicely(moveArray[i].version_group_details[j].move_learn_method.name) + " (lvl " + moveArray[i].version_group_details[j].level_learned_at + ")";
-                        } else { 
-                            moveMethod.innerHTML = displayNicely(moveArray[i].version_group_details[j].move_learn_method.name);
-                        }
-                        newRow.append(moveVer, moveMethod);
-                    } else { 
-                        const moveVer = document.createElement("td");
-                        moveVer.innerHTML = displayGameNames(moveArray[i].version_group_details[j].version_group.name);
-                        const moveMethod = document.createElement("td");
-                        if (moveArray[i].version_group_details[j].move_learn_method.name === "level-up") {
-                            moveMethod.innerHTML = displayNicely(moveArray[i].version_group_details[j].move_learn_method.name) + " (lvl " + moveArray[i].version_group_details[j].level_learned_at + ")";
-                        } else { 
-                            moveMethod.innerHTML = displayNicely(moveArray[i].version_group_details[j].move_learn_method.name);
-                        }
-                        newMove.append(moveVer, moveMethod);
-                    }
+        for (let i = 0; i < singlePoke.moves.length; i++) {
+            for (let j = 0; j < singlePoke.moves[i].version_group_details.length; j++) {
+                if ((movesFilter2.value === singlePoke.moves[i].version_group_details[j].version_group.name && movesFilter3.value === singlePoke.moves[i].version_group_details[j].move_learn_method.name)
+                    || (movesFilter2.value === singlePoke.moves[i].version_group_details[j].version_group.name && !movesFilter3.value)) {
+                    fillTable(singlePoke.moves[i], singlePoke.moves[i].version_group_details[j]);
                 }
             }
-        }
-    }
-            
+        }   
+    });       
 
     //*   fill method filter select
     const moveLearnMethod = [];
@@ -478,6 +434,20 @@ function createCard(singlePoke) {
         movesFilter3.appendChild(methodSelectOption);
     }
 
+    movesFilter3.addEventListener("change", () => {
+        movesFilter1.value = "";
+        movesTable.innerHTML = "";
+        createMoveTableHeaders();
+        for (let i = 0; i < singlePoke.moves.length; i++) {
+            for (let j = 0; j < singlePoke.moves[i].version_group_details.length; j++) {
+                if ((movesFilter2.value === singlePoke.moves[i].version_group_details[j].version_group.name && movesFilter3.value === singlePoke.moves[i].version_group_details[j].move_learn_method.name)
+                || (movesFilter3.value === singlePoke.moves[i].version_group_details[j].move_learn_method.name && !movesFilter2.value)) {
+                    fillTable(singlePoke.moves[i], singlePoke.moves[i].version_group_details[j]);
+                }
+            }
+        }
+    });
+
 
     function createMoveTableHeaders () {
         const headings = document.createElement("tr");
@@ -489,6 +459,18 @@ function createCard(singlePoke) {
         learnedByCol.innerHTML = "Method";
         headings.append(moveNameCol, gameVerCol, learnedByCol);
         movesTable.appendChild(headings);
+    }
+
+    function fillTable (loop1, loop2) { 
+        const newRow = document.createElement("tr");
+        movesTable.appendChild(newRow);
+        const nameCell = document.createElement("td");
+        nameCell.innerHTML = displayNicely(loop1.move.name);
+        const gameCell = document.createElement("td");
+        gameCell.innerHTML = displayNicely(loop2.version_group.name);
+        const methodCell = document.createElement("td");
+        whichLevel(loop2, methodCell);
+        newRow.append(nameCell, gameCell, methodCell);
     }
 
     function fillMovesTable(moveArray) {
@@ -503,11 +485,7 @@ function createCard(singlePoke) {
             const moveVer = document.createElement("td");
             moveVer.innerHTML = displayGameNames(moveArray[i].version_group_details[0].version_group.name);
             const learnedBy = document.createElement("td");
-            if (moveArray[i].version_group_details[0].move_learn_method.name === "level-up") {
-                learnedBy.innerHTML = displayNicely(moveArray[i].version_group_details[0].move_learn_method.name) + " (lvl " + moveArray[i].version_group_details[0].level_learned_at + ")";
-            } else { 
-                learnedBy.innerHTML = displayNicely(moveArray[i].version_group_details[0].move_learn_method.name);
-            }
+            whichLevel(moveArray[i].version_group_details[0], learnedBy);
             newMove.append(moveName, moveVer, learnedBy);
             if (moveArray[i].version_group_details.length > 1) {
                 for (let j = 1; j < moveArray[i].version_group_details.length; j++) {
@@ -518,11 +496,7 @@ function createCard(singlePoke) {
                     const nextVer = document.createElement("td");
                     nextVer.innerHTML = displayGameNames(moveArray[i].version_group_details[j].version_group.name);
                     const nextMethod = document.createElement("td");
-                    if (moveArray[i].version_group_details[j].move_learn_method.name === "level-up") {
-                        nextMethod.innerHTML = displayNicely(moveArray[i].version_group_details[j].move_learn_method.name) + " (lvl " + moveArray[i].version_group_details[j].level_learned_at + ")";
-                    } else { 
-                        nextMethod.innerHTML = displayNicely(moveArray[i].version_group_details[j].move_learn_method.name);
-                    }
+                    whichLevel(moveArray[i].version_group_details[j], nextMethod);
                     nextRow.append(nextVer, nextMethod);
                     movesTable.appendChild(nextRow);
                 }
@@ -576,27 +550,35 @@ function createCard(singlePoke) {
     const ultraSunUltraMoon = Object.values(singlePoke.sprites.versions["generation-vii"]["ultra-sun-ultra-moon"]);
     const icons = Object.values(singlePoke.sprites.versions["generation-viii"].icons);
     const allGameSprites = [].concat(defaultSprites, redBlue, yellow, crystal, gold, silver, emerald, fireRedLeafGreen, rubySapphire, diamondPearl, heartGoldSoulSilver, platinum, blackWhite, blackWhiteAnimated, omegaRubyAlphaSapphire, xY, ultraSunUltraMoon, icons);
+    console.log(allGameSprites);
     for (let i = 0; i < allGameSprites.length; i++) {
         if (allGameSprites[i] !== null) {
-                const spriteImg = document.createElement("img");
-                spriteImg.setAttribute("src", allGameSprites[i], "alt", singlePoke.name);
-                spriteDisplay.appendChild(spriteImg);
-                spriteImg.onload = () => {
-                    if (spriteImg.width < 128) {
-                        let difference = 128 - spriteImg.width;
-                        difference = difference / 2 + "px";
-                        spriteImg.style.margin = difference;
-                    }
+            const spriteImg = document.createElement("img");
+            spriteImg.setAttribute("src", allGameSprites[i], "alt", singlePoke.name);
+            spriteDisplay.appendChild(spriteImg);
+            spriteImg.onload = () => {
+                if (spriteImg.width < 128) {
+                    let difference = 128 - spriteImg.width;
+                    difference = difference / 2 + "px";
+                    spriteImg.style.margin = difference;
                 }
+            }
         }
     }
+
+    // if (spriteCheckbox1.value) {                               //* checkbox labels not linked... 
+    //     for (let i = 0; )
+    // }
 
     const closeModelButton = document.createElement("button");
     closeModelButton.setAttribute("style", "align-self: center; margin: 1em;")
     closeModelButton.innerHTML = "Close";
     closeModelButton.addEventListener("click", () => modalBackground.style.display = "none");
 
-    spriteFilterSection.append(spriteCheckbox1, spriteCheckbox1Label, spriteCheckbox2, spriteCheckbox2Label, spriteCheckbox3, spriteCheckbox3Label);
+    spriteCheckbox1Label.appendChild(spriteCheckbox1);
+    spriteCheckbox2Label.appendChild(spriteCheckbox2);
+    spriteCheckbox3Label.appendChild(spriteCheckbox3);
+    spriteFilterSection.append(spriteCheckbox1Label,spriteCheckbox2Label,spriteCheckbox3Label);
     spriteHeader.append(spriteH3, spriteFilterSection, spriteDisplay)
     spriteSection.append(spriteHeader);
     abilitiesLine.append(abilitiesH3, abilitiesList)
@@ -607,7 +589,7 @@ function createCard(singlePoke) {
     baseStatsLine.append(baseStatsH3, baseStatsTable);
     content.append(typeLine, baseStatsLine, heightWeightLine, abilitiesLine);
     imgDiv.appendChild(mainImg);
-    selectorsWrapper.append(movesFilter1, movesFilter2, movesFilter3);
+    selectorsWrapper.append(movesFilter1, or, movesFilter2, movesFilter3);
     movesFilterSection.appendChild(selectorsWrapper);
     movesDiv.appendChild(movesTable);
     movesDivWrapper.append(movesH3, movesFilterSection, movesDiv)
@@ -635,6 +617,14 @@ function displayNicely(string) {
             final += noHyphens.charAt(i);
         }
     } return final;
+}
+
+function whichLevel(para, cell) {
+    if (para.move_learn_method.name === "level-up") {
+        cell.innerHTML = displayNicely(para.move_learn_method.name) + " (lvl " + para.level_learned_at + ")";
+    } else { 
+        cell.innerHTML = displayNicely(para.move_learn_method.name);
+    }
 }
 
 function displayGameNames(gameName) {
