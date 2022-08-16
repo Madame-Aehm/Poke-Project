@@ -161,12 +161,14 @@ ol {
 }
 
 .moves-table th {
+    width: 33%;
     color: white;
     background-color: #dc7475;
     border: solid 2px #dc7475;
 }
 
 .moves-table td {
+    width: 33%;
     border: solid 2px #dc7475;
     padding: 0.5em;
     text-align: center;
