@@ -77,17 +77,17 @@ h3 {
     margin-top: 0.5em
 }
 
+.hidden-content-container {
+    display: flex;
+    align-content: space-between;
+    gap: 0.5em;
+}
+
 p {
     margin-top: 0.5em;
     margin-bottom: 0.2em;
     font-size: large;
     font-weight: bold;
-}
-
-.hidden-content-container {
-    display: flex;
-    align-content: space-between;
-    gap: 0.5em;
 }
 
 select {
@@ -116,7 +116,6 @@ button:hover {
 button:active {
     background-color: white;
     color: #dc7475;
-   
 }
 
 #card-container {
@@ -128,6 +127,22 @@ button:active {
     border-radius: 12px;
     min-height: 130px;
     max-width: 100%;
+}
+
+.card-div {
+    cursor: pointer; 
+    display: flex; 
+    flex-direction: column; 
+    margin-bottom: 0.5em; 
+    margin-top: 0.5em; 
+    border: solid 2px black; 
+    border-radius: 6px; 
+    font-size: large; 
+    font-weight: bold;
+} 
+
+.card-div:hover {
+    box-shadow: 5px 5px 10px #dc7475;
 }
 
 .stats-table {
@@ -173,12 +188,27 @@ ol {
 label {
     padding: 0.5em;
     border: solid 2px black;
-    background-color: #e0e0e0;
+    background-color: #fc8485;
+    color: white;
     border-radius: 12px;
+    cursor: pointer;
 }
 
-.checkbox-wrapper input[type="checkbox"]:checked {
+label:hover {
     background-color: #dc7475;
+}
+
+
+.sprite-display {
+    display: flex; 
+    flex-flow: row nowrap; 
+    align-items: center; 
+    justify-content: space-evenly; 
+    max-width: 100%; 
+    min-height: 166px; 
+    overflow-x: scroll; 
+    border: solid 2px black; 
+    border-radius: 12px;
 }
 
 @media only screen and (max-width: 650px) {
