@@ -109,10 +109,6 @@ button {
     cursor: pointer;
 }
 
-.more {
-    padding: 0.5em;
-}
-
 button:hover {
     background-color: #dc7475;
 }
@@ -170,8 +166,19 @@ ol {
 .moves-table td {
     width: 33%;
     border: solid 2px #dc7475;
-    padding: 0.5em;
+    padding: 0.2em;
     text-align: center;
+}
+
+label {
+    padding: 0.5em;
+    border: solid 2px black;
+    background-color: #e0e0e0;
+    border-radius: 12px;
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked {
+    background-color: #dc7475;
 }
 
 @media only screen and (max-width: 650px) {

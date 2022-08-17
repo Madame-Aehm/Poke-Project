@@ -1,4 +1,5 @@
 const body = document.querySelector("body");
+const modalDiv = document.getElementById("modal-div");
 const cardContainer = document.getElementById("card-container");
 const buttonText = document.getElementById("showFilters");
 const hiddenSpan = document.getElementById("hidden-span");
@@ -10,17 +11,6 @@ const clearButton = document.getElementById("clear");
 const ddType1 = document.getElementById("type1");
 const ddType2 = document.getElementById("type2");
 const allSelectors = document.querySelectorAll("select");
-
-function showFilters () {
-    if (hiddenSpan.style.display === "block") {
-        hiddenSpan.style.display = "none";
-        buttonText.innerHTML = "More ▼";
-        // ddType1.value = "";                                                 //? this doesn't count as a "change" :(
-    } else {
-        hiddenSpan.style.display = "block";
-        buttonText.innerHTML = "Less ▲";
-    }
-}
 
 function fullFetch () {
     fetch("https://pokeapi.co/api/v2/pokemon/?limit=1154").then(function (response) {
@@ -39,7 +29,7 @@ fullFetch();
 
 function fullListController (fullList) {
     reset(fullList);
-    setEventListeners(fullList)
+    setEventListeners(fullList);
 }
 
 function reset (fullList) {
@@ -49,6 +39,7 @@ function reset (fullList) {
 }
 
 function setEventListeners(fullList) {
+
     ddType1.addEventListener("change", () => reset(fullList));
     searchButton.addEventListener("click",() => makeSearch(fullList));
     nameSearch.addEventListener("keypress", (e) => {
@@ -56,10 +47,26 @@ function setEventListeners(fullList) {
             makeSearch(fullList);
           }
     });
+    buttonText.addEventListener("click", () => {
+        showFilters(fullList);
+    });
+}
+
+function showFilters (fullList) {
+    if (hiddenSpan.style.display === "block") {
+        hiddenSpan.style.display = "none";
+        buttonText.innerHTML = "More ▼";
+        ddType1.value = "";
+        makeSearchSuggestions(fullList)
+    } else {
+        hiddenSpan.style.display = "block";
+        buttonText.innerHTML = "Less ▲";
+    }
 }
 
 function removeExistingData (){
     cardContainer.innerHTML = "";
+    modalDiv.innerHTML = "";
 }
 
   function shuffleList(fullList) {
@@ -67,15 +74,20 @@ function removeExistingData (){
 }
 
 function takeFive (list) {
-    removeExistingData()
-    const newArray = [];
-    for (let i = 0; i < list.length; i++) {
-        newArray.push(list[i])
-    }
-    shuffleList(newArray);
-    for (let i = 0; i < 5; i++) {
-        let singleURL = newArray[i].url;
-        fetchSinglePoke(singleURL);
+    if (list.length === 0) {
+        noMonHere();
+    } else {
+        nameSearch.value = "";
+        removeExistingData()
+        const newArray = [];
+        for (let i = 0; i < list.length; i++) {
+            newArray.push(list[i])
+        }
+        shuffleList(newArray);
+        for (let i = 0; i < 5; i++) {
+            let singleURL = newArray[i].url;
+            fetchSinglePoke(singleURL);
+        }
     }
 }
 
@@ -167,6 +179,7 @@ function ddFillType1(typesList) {
 
 function addTypeEL(typesList) {
     ddType1.addEventListener("change",() => {
+        nameSearch.value = "";
         getSingleTypeList();
         ddFillType2(typesList);
     });
@@ -179,7 +192,10 @@ function getSingleTypeList() {
         .then((result) => {
             const typeList = result.pokemon;
             const compatibleType1 = typeList.map((element) => element.pokemon);
-            ddType2.addEventListener("change",() => get2ndSingleTypeList(compatibleType1));
+            ddType2.addEventListener("change",() => {
+                nameSearch.value = "";
+                get2ndSingleTypeList(compatibleType1);
+            });
             makeSearchSuggestions(compatibleType1);
         }).catch((error)=>{console.log(error)}); 
     }
@@ -202,6 +218,8 @@ function get2ndSingleTypeList(type1List) {
             .filter(e => duplicatesArray[e]).map(e => duplicatesArray[e]);              //* eliminate the dead keys & store unique objects
             makeSearchSuggestions(duelTypesList);
         }).catch((error)=>{console.log(error)})
+    } else {
+        makeSearchSuggestions(type1List);
     }
 }
 
@@ -519,27 +537,34 @@ function createCard(singlePoke) {
     const spriteH3 = document.createElement("h3");
     spriteH3.innerHTML = "Sprites: ";
     const spriteFilterSection = document.createElement("span");
-    spriteFilterSection.setAttribute("style", "display: flex; gap: 2em; margin: 0.3em;")
+    spriteFilterSection.setAttribute("style", "display: flex; flex-flow: row wrap; gap: 1em; margin: 0.3em;")
+    spriteFilterSection.classList.add("checkbox-wrapper");
 
     const spriteCheckbox1 = document.createElement("input");
     spriteCheckbox1.type = "checkbox";
     spriteCheckbox1.id = "front";
     const spriteCheckbox1Label = document.createElement("label");
     spriteCheckbox1Label.htmlFor = "front";
-    spriteCheckbox1Label.innerHTML = "Front";
+    spriteCheckbox1Label.innerHTML = "Front ";
     spriteCheckbox1.addEventListener("input", () => {
         spriteDisplay.innerHTML = "";
-        if (!spriteCheckbox1.checked && !spriteCheckbox2.checked && !spriteCheckbox3.checked) {
+        if (!spriteCheckbox1.checked && !spriteCheckbox2.checked && !spriteCheckbox3.checked && !spriteCheckbox4.checked) {
             displayAllSprites(cleanSpritesList);
         } else if (spriteCheckbox1.checked) {
             spriteCheckbox2.checked = false;
             if (spriteCheckbox3.checked) {
                 shinyFront();
+            } else if (spriteCheckbox4.checked) {
+                defaultFront();
             } else {
                 front();
             }
         } else {
-            shiny();
+            if (spriteCheckbox3.checked) {
+                shiny();
+            } else {
+                defaultAll();
+            }
         }
     });
 
@@ -548,20 +573,26 @@ function createCard(singlePoke) {
     spriteCheckbox2.id = "back";
     const spriteCheckbox2Label = document.createElement("label");
     spriteCheckbox2Label.htmlFor = "back";
-    spriteCheckbox2Label.innerHTML = "Back";
+    spriteCheckbox2Label.innerHTML = "Back ";
     spriteCheckbox2.addEventListener("input", () => {
         spriteDisplay.innerHTML = "";
-        if (!spriteCheckbox1.checked && !spriteCheckbox2.checked && !spriteCheckbox3.checked) {
+        if (!spriteCheckbox1.checked && !spriteCheckbox2.checked && !spriteCheckbox3.checked && !spriteCheckbox4.checked) {
             displayAllSprites(cleanSpritesList);
         } else if (spriteCheckbox2.checked) {
             spriteCheckbox1.checked = false;
             if (spriteCheckbox3.checked) {
                 shinyBack();
-            } else if (!spriteCheckbox3.checked) {
+            } else if (spriteCheckbox4.checked) {
+                defaultBack();
+            } else {
                 back();
             }
         } else {
-            shiny();
+            if (spriteCheckbox3.checked) {
+                shiny();
+            } else {
+                defaultAll();
+            }
         }
     });
 
@@ -570,20 +601,49 @@ function createCard(singlePoke) {
     spriteCheckbox3.id = "shiny";
     const spriteCheckbox3Label = document.createElement("label");
     spriteCheckbox3Label.htmlFor = "shiny";
-    spriteCheckbox3Label.innerHTML = "Shiny";
+    spriteCheckbox3Label.innerHTML = "Shiny ";
     spriteCheckbox3.addEventListener("input", () => {
         spriteDisplay.innerHTML = "";
-        if (!spriteCheckbox1.checked && !spriteCheckbox2.checked && !spriteCheckbox3.checked) {
+        if (!spriteCheckbox1.checked && !spriteCheckbox2.checked && !spriteCheckbox3.checked && !spriteCheckbox4.checked) {
             displayAllSprites(cleanSpritesList);
         } else if (spriteCheckbox3.checked) {
+            spriteCheckbox4.checked = false;
             if (spriteCheckbox1.checked) {
                 shinyFront();
             } else if (spriteCheckbox2.checked) {
                 shinyBack();
-            } else if (!spriteCheckbox1.checked && !spriteCheckbox2.checked) {
+            } else {
                 shiny();
             } 
-        } else if (!spriteCheckbox3.checked) {
+        } else {
+            if (spriteCheckbox1.checked) {
+                front();
+            } else if (spriteCheckbox2.checked) {
+                back();
+            }
+        }
+    });
+
+    const spriteCheckbox4 = document.createElement("input");
+    spriteCheckbox4.type = "checkbox";
+    spriteCheckbox4.id = "default";
+    const spriteCheckbox4Label = document.createElement("label");
+    spriteCheckbox4Label.htmlFor = "default";
+    spriteCheckbox4Label.innerHTML = "Default ";
+    spriteCheckbox4.addEventListener("input", () => {
+        spriteDisplay.innerHTML = "";
+        if (!spriteCheckbox1.checked && !spriteCheckbox2.checked && !spriteCheckbox3.checked && !spriteCheckbox4.checked) {
+            displayAllSprites(cleanSpritesList);
+        } else if (spriteCheckbox4.checked) {
+            spriteCheckbox3.checked = false;
+            if (spriteCheckbox1.checked) {
+                defaultFront();
+            } else if (spriteCheckbox2.checked) {
+                defaultBack();
+            } else {
+                defaultAll();
+            } 
+        } else {
             if (spriteCheckbox1.checked) {
                 front();
             } else if (spriteCheckbox2.checked) {
@@ -644,6 +704,30 @@ function createCard(singlePoke) {
             }
         }
     }
+
+    function defaultAll () {
+        for (let i = 0; i < cleanSpritesList.length; i++) {
+            if (!cleanSpritesList[i].includes("/shiny")) {
+                spritesFiltered(cleanSpritesList[i]);
+            }
+        }
+    }
+
+    function defaultFront () {
+        for (let i = 0; i < cleanSpritesList.length; i++) {
+            if (!cleanSpritesList[i].includes("/back") && !cleanSpritesList[i].includes("/shiny")) {
+                spritesFiltered(cleanSpritesList[i]);
+            }
+        }
+    }
+
+    function defaultBack () {
+        for (let i = 0; i < cleanSpritesList.length; i++) {
+            if (cleanSpritesList[i].includes("/back") && !cleanSpritesList[i].includes("/shiny")) {
+                spritesFiltered(cleanSpritesList[i]);
+            }
+        }
+    }
     
     const spriteDisplay = document.createElement("div");
     spriteDisplay.setAttribute("style", "display: flex; flex-flow: row no-wrap; align-items: center; justify-content: space-between; max-width: 100%; overflow-x: scroll; border: solid 2px black; border-radius: 12px");
@@ -667,7 +751,7 @@ function createCard(singlePoke) {
     const xY = Object.values(singlePoke.sprites.versions["generation-vi"]["x-y"]);
     const ultraSunUltraMoon = Object.values(singlePoke.sprites.versions["generation-vii"]["ultra-sun-ultra-moon"]);
     const icons = Object.values(singlePoke.sprites.versions["generation-viii"].icons);
-    const allGameSprites = [].concat(defaultSprites, redBlue, yellow, crystal, gold, silver, emerald, fireRedLeafGreen, rubySapphire, diamondPearl, heartGoldSoulSilver, platinum, blackWhite, blackWhiteAnimated, omegaRubyAlphaSapphire, xY, ultraSunUltraMoon, icons);
+    const allGameSprites = [].concat(icons, redBlue, yellow, crystal, gold, silver, emerald, fireRedLeafGreen, rubySapphire, diamondPearl, heartGoldSoulSilver, platinum, blackWhite, blackWhiteAnimated, omegaRubyAlphaSapphire, xY, ultraSunUltraMoon);
     const cleanSpritesList = [];
     for (let i = 0; i < allGameSprites.length; i++) {
         if (allGameSprites[i] !== null) {
@@ -677,17 +761,35 @@ function createCard(singlePoke) {
     displayAllSprites(cleanSpritesList);
 
     function displayAllSprites (spritesURLS) {
-        for (let i = 0; i < spritesURLS.length; i++) {
-            const spriteImg = document.createElement("img");
-            spriteImg.setAttribute("src", spritesURLS[i], "alt", singlePoke.name);
-            spriteDisplay.appendChild(spriteImg);
-            spriteImg.onload = () => {
-                if (spriteImg.width < 128) {
-                    let difference = 128 - spriteImg.width;
-                    difference = difference / 2 + "px";
-                    spriteImg.style.margin = difference;
+        if (spritesURLS.length === 0) {
+            const replaceImg = document.createElement("img");
+            replaceImg.setAttribute("src", "assets/images/sleeping.png");
+            spriteDisplay.appendChild(replaceImg);
+            spriteDisplay.style.justifyContent = "center";
+            spriteCheckbox1.disabled = true;
+            spriteCheckbox2.disabled = true;
+            spriteCheckbox3.disabled = true;
+            spriteCheckbox4.disabled = true;
+        } else {
+            const checkForBack = [];
+            for (let i = 0; i < spritesURLS.length; i++) {
+                const spriteImg = document.createElement("img");
+                spriteImg.setAttribute("src", spritesURLS[i], "alt", singlePoke.name);
+                spriteDisplay.appendChild(spriteImg);
+                spriteImg.onload = () => {
+                    if (spriteImg.width < 128) {
+                        let difference = 128 - spriteImg.width;
+                        difference = difference / 2 + "px";
+                        spriteImg.style.margin = difference;
+                    }
+                }
+                if (spritesURLS[i].includes("/back")) {
+                    checkForBack.push(spritesURLS[i])
                 }
             }
+            if (checkForBack.length === 0) {
+                spriteCheckbox2.disabled = true;
+            }  
         }
     }
 
@@ -699,8 +801,11 @@ function createCard(singlePoke) {
         body.style.overflow = "initial";
     });
 
- 
-    spriteFilterSection.append(spriteCheckbox1, spriteCheckbox1Label, spriteCheckbox2, spriteCheckbox2Label, spriteCheckbox3, spriteCheckbox3Label);
+    spriteCheckbox4Label.appendChild(spriteCheckbox4);
+    spriteCheckbox1Label.appendChild(spriteCheckbox1);
+    spriteCheckbox2Label.appendChild(spriteCheckbox2);
+    spriteCheckbox3Label.appendChild(spriteCheckbox3);
+    spriteFilterSection.append(spriteCheckbox1Label, spriteCheckbox2Label, spriteCheckbox3Label, spriteCheckbox4Label);
     spriteHeader.append(spriteH3, spriteFilterSection, spriteDisplay);
     spriteSection.append(spriteHeader);
     abilitiesLine.append(abilitiesH3, abilitiesList)
@@ -720,7 +825,7 @@ function createCard(singlePoke) {
     modalHeader.append(close, h1);
     modal.append(modalHeader, modalContent1, spriteSection, closeModelButton);
     modalBackground.appendChild(modal);
-    body.appendChild(modalBackground);
+    modalDiv.appendChild(modalBackground);
 
     cardDiv.addEventListener("click", () => {
         modalBackground.style.display = "block";
@@ -729,8 +834,8 @@ function createCard(singlePoke) {
 }
 
 function displayNicely(string) {
-    const removeFirstHyphen = string.replace("-", " ");
-    noHyphens = removeFirstHyphen.replace("-", " ");
+    let noHyphens = string.replace("-", " ");
+    noHyphens = noHyphens.replace("-", " ");
     let final = "";
     for (let i = 0; i < noHyphens.length; i++) {
         if (i === 0 || noHyphens.charAt(i - 1) === " ") {
