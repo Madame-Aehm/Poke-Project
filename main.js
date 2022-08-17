@@ -10,7 +10,6 @@ const searchButton = document.getElementById("search-button");
 const clearButton = document.getElementById("clear");
 const ddType1 = document.getElementById("type1");
 const ddType2 = document.getElementById("type2");
-const allSelectors = document.querySelectorAll("select");
 
 function fullFetch () {
     fetch("https://pokeapi.co/api/v2/pokemon/?limit=1154").then(function (response) {
@@ -39,7 +38,6 @@ function reset (fullList) {
 }
 
 function setEventListeners(fullList) {
-
     ddType1.addEventListener("change", () => reset(fullList));
     searchButton.addEventListener("click",() => makeSearch(fullList));
     nameSearch.addEventListener("keypress", (e) => {
@@ -111,11 +109,10 @@ function makeSearchSuggestions(list) {
 }
 
 function makeSearch (list) {
-    // let enteredText = nameSearch.value;
-    // enteredText.trim();                                                         //? want to incorporate this somehow
+    let enteredText = nameSearch.value.toLowerCase().trim().replace(" ", "-");  //* not sure what other conditions to reformat......
     let found = "";
     for (let i = 0; i < list.length; i++) {
-        if (list[i].name === nameSearch.value) {
+        if (list[i].name === enteredText) {
             found = "match found";
             removeExistingData();
             fetchSinglePoke(list[i].url);
@@ -156,8 +153,7 @@ function typesFetch() {
     fetch("https://pokeapi.co/api/v2/type/").then((response) => response.json())
     .then((result) => {
         const typesList = result.results
-        typesController(typesList)
-        return typesList;
+        typesController(typesList);
     }).catch((error)=>{console.log(error)}) 
 }
 
@@ -214,8 +210,8 @@ function get2ndSingleTypeList(type1List) {
             const duplicateNames = combinedList.map(e => e.name).filter((e, i, array) => array.indexOf(e) !==i);
             const duplicatesArray = combinedList.filter(e => duplicateNames.includes(e.name));
             const duelTypesList = duplicatesArray.map(e => e["name"])
-            .map((e, i, final) => final.indexOf(e) === i && i)                          //* store the keys of the unique objects
-            .filter(e => duplicatesArray[e]).map(e => duplicatesArray[e]);              //* eliminate the dead keys & store unique objects
+            .map((e, i, final) => final.indexOf(e) === i && i)                    //* store the keys of the unique objects
+            .filter(e => duplicatesArray[e]).map(e => duplicatesArray[e]);        //* eliminate the dead keys & store unique objects
             makeSearchSuggestions(duelTypesList);
         }).catch((error)=>{console.log(error)})
     } else {
@@ -244,11 +240,11 @@ function ddFillType2(typesList) {
 function createCard(singlePoke) {
     const cardDiv = document.createElement("div");
     cardContainer.appendChild(cardDiv);
-    cardDiv.setAttribute("style", "display: flex; flex-direction: column; margin-bottom: 0.5em; margin-top: 0.5em; border: solid 2px black; border-radius: 6px; font-size: large; font-weight: bold;");
+    cardDiv.classList.add("card-div");
     const nameDiv = document.createElement("div");
     cardDiv.appendChild(nameDiv);
     nameDiv.innerHTML = displayNicely(singlePoke.name);
-    nameDiv.setAttribute("style", "display: flex; justify-content: center; padding: 0.2em; color: white; background-color: #fc8485; align-self: stretch; border-top-left-radius: 3px 3px; border-top-right-radius: 3px 3px;")
+    nameDiv.classList.add("name-div");
     const img = document.createElement("img");
     img.setAttribute("style", "width: 100px; align-self:center;") 
     if (singlePoke.sprites.front_default === null) {
@@ -260,9 +256,9 @@ function createCard(singlePoke) {
 
     //*                                        modal construction start point                                        
     const modalBackground = document.createElement("div");
-    modalBackground.setAttribute("style", "display: none; position: fixed; top: 0; left: 0; z-index: 1; height: 100%; width: 100%; background-color: rgba(0,0,0,0.2);");
+    modalBackground.classList.add("modal-background");
     const modal = document.createElement("div");
-    modal.setAttribute("style", "display: flex; flex-direction: column; margin: 1% auto; border: solid 2px black; border-radius: 12px; background-color: white; width: 90%; height: 90%; overflow-y: scroll; font-size: large;")
+    modal.classList.add("modal");
     
     //*                                          modal header ..................................................
     const modalHeader = document.createElement("div");
@@ -730,7 +726,7 @@ function createCard(singlePoke) {
     }
     
     const spriteDisplay = document.createElement("div");
-    spriteDisplay.setAttribute("style", "display: flex; flex-flow: row no-wrap; align-items: center; justify-content: space-between; max-width: 100%; overflow-x: scroll; border: solid 2px black; border-radius: 12px");
+    spriteDisplay.classList.add("sprite-display");
     
     const defaultSprites = Object.values(singlePoke.sprites);
     defaultSprites.length = defaultSprites.length -2;
@@ -832,6 +828,7 @@ function createCard(singlePoke) {
         body.style.overflow = "hidden";
     });
 }
+//*................................................end create card function .............................................
 
 function displayNicely(string) {
     let noHyphens = string.replace("-", " ");

@@ -145,6 +145,41 @@ button:active {
     box-shadow: 5px 5px 10px #dc7475;
 }
 
+.name-div {
+    display: flex; 
+    justify-content: center; 
+    padding: 0.2em; 
+    color: white; 
+    background-color: #fc8485;
+    align-self: stretch; 
+    border-top-left-radius: 3px 3px; 
+    border-top-right-radius: 3px 3px;
+}
+
+.modal-background {
+    display: none; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    z-index: 1; 
+    height: 100%; 
+    width: 100%; 
+    background-color: rgba(0,0,0,0.2);
+}
+
+.modal {
+    display: flex; 
+    flex-direction: column; 
+    margin: 1% auto; 
+    border: solid 2px black; 
+    border-radius: 12px; 
+    background-color: white; 
+    width: 90%; 
+    height: 90%; 
+    overflow-y: scroll; 
+    font-size: large;
+}
+
 .stats-table {
     width: 100%;
 }
@@ -203,7 +238,6 @@ label:hover {
     display: flex; 
     flex-flow: row nowrap; 
     align-items: center; 
-    justify-content: space-evenly; 
     max-width: 100%; 
     min-height: 166px; 
     overflow-x: scroll; 
