@@ -65,6 +65,7 @@ function showFilters (fullList) {
 function removeExistingData (){
     cardContainer.innerHTML = "";
     modalDiv.innerHTML = "";
+    nameSearch.value = "";
 }
 
   function shuffleList(fullList) {
@@ -175,7 +176,7 @@ function ddFillType1(typesList) {
 }
 
 function addTypeEL(typesList) {
-    ddType1.addEventListener("change",() => {
+    ddType1.addEventListener("change", () => {
         nameSearch.value = "";
         getSingleTypeList();
         ddFillType2(typesList);
@@ -656,7 +657,9 @@ function createCard(singlePoke) {
 
     function spritesFiltered(spriteURL) {
         const spriteImg = document.createElement("img");
-        spriteImg.setAttribute("src", spriteURL, "alt", singlePoke.name);
+        spriteImg.src = spriteURL
+        spriteImg.alt = singlePoke.name;
+        spriteImg.title = findGen(spriteURL);
         spriteDisplay.appendChild(spriteImg);
         spriteImg.onload = () => {
             if (spriteImg.width < 128) {
@@ -776,7 +779,9 @@ function createCard(singlePoke) {
             const checkForBack = [];
             for (let i = 0; i < spritesURLS.length; i++) {
                 const spriteImg = document.createElement("img");
-                spriteImg.setAttribute("src", spritesURLS[i], "alt", singlePoke.name);
+                spriteImg.src = spritesURLS[i]
+                spriteImg.alt = singlePoke.name;
+                spriteImg.title = findGen(spritesURLS[i]);
                 spriteDisplay.appendChild(spriteImg);
                 spriteImg.onload = () => {
                     if (spriteImg.width < 128) {
@@ -921,6 +926,19 @@ function displayGameNames(gameName) {
     if (gameName === "lets-go-pikachu-lets-go-eevee") {
         return "Let's Go Pikachu/Let's Go Eevee";
     }
+}
+
+function findGen (spriteURL) {
+    let  generation = [];
+    for (let i = 82; i < spriteURL.length; i++) {
+        generation.push(spriteURL[i])
+        if (spriteURL[i] === "/") {
+            break;
+        }
+    }
+    generation.length = generation.length - 1;
+    generation = generation.join("").replace("-", " ");
+    return generation;
 }
 
 function checkboxHover (checkbox, label) {
