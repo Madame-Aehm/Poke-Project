@@ -138,12 +138,13 @@ function noMonHere() {
 
 function fetchSinglePoke (pokeURL) {
     fetch(pokeURL).then(function (response) {
+        body.style.cursor = "progress";
         return response.json()
     }).then(function (result) {
         const singlePoke = result;
         console.log(singlePoke);
         createCard(singlePoke);
-        return singlePoke;
+        body.style.cursor = "default";
     }).catch((error)=>{console.log(error)})
 }
 
@@ -168,7 +169,7 @@ function ddFillType1(typesList) {
         for (let i = 0; i < typesList.length; i++) {
             const option = document.createElement("option");
             option.setAttribute("value", typesList[i].name);
-            option.innerHTML = typesList[i].name;
+            option.innerHTML = displayNicely(typesList[i].name);
             ddType1.appendChild(option);
         }
 }
@@ -231,7 +232,7 @@ function ddFillType2(typesList) {
             for (let i = 0; i < editedList.length; i++) {
                 const option = document.createElement("option");
                 option.setAttribute("value", editedList[i].name);
-                option.innerHTML = editedList[i].name;
+                option.innerHTML = displayNicely(editedList[i].name);
                 ddType2.appendChild(option);
             }
         }
@@ -364,7 +365,7 @@ function createCard(singlePoke) {
     selectorsWrapper.setAttribute("style", "display: flex; gap: 0.5em; padding-bottom: 0.5em;")
 
     const movesFilterSection = document.createElement("div");
-    movesFilterSection.innerHTML = "Filter by: ";
+    movesFilterSection.innerHTML = "Filter: ";
     const movesFilter1 = document.createElement("select");
     movesFilter1.setAttribute("id", "move", "name", "move");
     const movesFilter1FirstValue = document.createElement("option");
@@ -417,6 +418,10 @@ function createCard(singlePoke) {
 
 
     //*   fill move filter select
+    
+
+
+
     for (let i = 0; i < singlePoke.moves.length; i++) {
         const moveSelectOption = document.createElement("option");
         moveSelectOption.value = singlePoke.moves[i].move.name;
@@ -527,6 +532,7 @@ function createCard(singlePoke) {
         }
     }
 
+    //*                                                  sprites div...........................................
     const spriteSection = document.createElement("div");
     spriteSection.setAttribute("style", "padding-left: 1em; padding-right: 1em;");
     const spriteHeader = document.createElement("div");
@@ -536,11 +542,11 @@ function createCard(singlePoke) {
     spriteFilterSection.setAttribute("style", "display: flex; flex-flow: row wrap; gap: 1em; margin: 0.3em;")
     spriteFilterSection.classList.add("checkbox-wrapper");
 
-    const spriteCheckbox1 = document.createElement("input");
+    let spriteCheckbox1 = document.createElement("input");
     spriteCheckbox1.type = "checkbox";
     spriteCheckbox1.id = "front";
     const spriteCheckbox1Label = document.createElement("label");
-    spriteCheckbox1Label.htmlFor = "front";
+    checkboxHover(spriteCheckbox1, spriteCheckbox1Label);
     spriteCheckbox1Label.innerHTML = "Front ";
     spriteCheckbox1.addEventListener("input", () => {
         spriteDisplay.innerHTML = "";
@@ -564,11 +570,11 @@ function createCard(singlePoke) {
         }
     });
 
-    const spriteCheckbox2 = document.createElement("input");
+    let spriteCheckbox2 = document.createElement("input");
     spriteCheckbox2.type = "checkbox";
     spriteCheckbox2.id = "back";
     const spriteCheckbox2Label = document.createElement("label");
-    spriteCheckbox2Label.htmlFor = "back";
+    checkboxHover(spriteCheckbox2, spriteCheckbox2Label);
     spriteCheckbox2Label.innerHTML = "Back ";
     spriteCheckbox2.addEventListener("input", () => {
         spriteDisplay.innerHTML = "";
@@ -592,11 +598,11 @@ function createCard(singlePoke) {
         }
     });
 
-    const spriteCheckbox3 = document.createElement("input");
+    let spriteCheckbox3 = document.createElement("input");
     spriteCheckbox3.type = "checkbox";
     spriteCheckbox3.id = "shiny";
     const spriteCheckbox3Label = document.createElement("label");
-    spriteCheckbox3Label.htmlFor = "shiny";
+    checkboxHover(spriteCheckbox3, spriteCheckbox3Label);
     spriteCheckbox3Label.innerHTML = "Shiny ";
     spriteCheckbox3.addEventListener("input", () => {
         spriteDisplay.innerHTML = "";
@@ -620,11 +626,11 @@ function createCard(singlePoke) {
         }
     });
 
-    const spriteCheckbox4 = document.createElement("input");
+    let spriteCheckbox4 = document.createElement("input");
     spriteCheckbox4.type = "checkbox";
     spriteCheckbox4.id = "default";
     const spriteCheckbox4Label = document.createElement("label");
-    spriteCheckbox4Label.htmlFor = "default";
+    checkboxHover(spriteCheckbox4, spriteCheckbox4Label);
     spriteCheckbox4Label.innerHTML = "Default ";
     spriteCheckbox4.addEventListener("input", () => {
         spriteDisplay.innerHTML = "";
@@ -915,4 +921,23 @@ function displayGameNames(gameName) {
     if (gameName === "lets-go-pikachu-lets-go-eevee") {
         return "Let's Go Pikachu/Let's Go Eevee";
     }
+}
+
+function checkboxHover (checkbox, label) {
+    label.addEventListener("mouseenter", () => {
+        if (checkbox.disabled === true) {
+            label.setAttribute("style", "background-color: #dc7475; cursor: not-allowed;")
+            checkbox.style.cursor = "not-allowed";
+        } else {
+            label.setAttribute("style", "background-color: #dc7475; cursor: pointer");
+        }
+    });
+    label.addEventListener("mouseleave", () => {
+        if (checkbox.disabled === true) {
+            label.setAttribute("style", "background-color: #dc7475; cursor: not-allowed;");
+            checkbox.style.cursor = "not-allowed";
+        } else {
+            label.setAttribute("style", "background-color: #fc8485; cursor: initial;");
+        }
+    });
 }

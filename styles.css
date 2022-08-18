@@ -142,7 +142,7 @@ button:active {
 } 
 
 .card-div:hover {
-    box-shadow: 5px 5px 10px #dc7475;
+    box-shadow: 5px 5px 10px #e0e0e0;
 }
 
 .name-div {
@@ -226,20 +226,14 @@ label {
     background-color: #fc8485;
     color: white;
     border-radius: 12px;
-    cursor: pointer;
 }
-
-label:hover {
-    background-color: #dc7475;
-}
-
 
 .sprite-display {
     display: flex; 
     flex-flow: row nowrap; 
     align-items: center; 
     max-width: 100%; 
-    min-height: 166px; 
+    height: 170px; 
     overflow-x: scroll; 
     border: solid 2px black; 
     border-radius: 12px;
