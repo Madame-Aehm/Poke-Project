@@ -417,12 +417,7 @@ function createCard(singlePoke) {
         }
     }
 
-
     //*   fill move filter select
-    
-
-
-
     for (let i = 0; i < singlePoke.moves.length; i++) {
         const moveSelectOption = document.createElement("option");
         moveSelectOption.value = singlePoke.moves[i].move.name;
@@ -476,7 +471,6 @@ function createCard(singlePoke) {
         createMoveTableHeaders();
         filtersCombined();
     });
-
 
     function createMoveTableHeaders () {
         const headings = document.createElement("tr");
