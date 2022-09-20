@@ -15,14 +15,18 @@ function fullFetch () {
     fetch("https://pokeapi.co/api/v2/pokemon/?limit=1154").then(function (response) {
          return response.json()     
     }).then((result) => {
-        const fullList = result.results
+        const fullList = result.results;
         // const URLarray = fullList.map(element=> element.url)
         // console.log('URLarray :>> ', URLarray);
         // fetchSingleUrl(URLarray)
-        fullListController(fullList)
+        fullListController(fullList);
         return fullList  
     }).catch((error)=>{console.log(error)}) 
 }
+
+// const  fetchSingleUrl = (URLarray) => {
+//     Promise.all(URLarray.map(url=> fetch(url).then((response)=>response.json()))).then((result)=> console.log('result :>> ', result))
+// }
 
 fullFetch();
 
@@ -55,7 +59,9 @@ function showFilters (fullList) {
         hiddenSpan.style.display = "none";
         buttonText.innerHTML = "More ▼";
         ddType1.value = "";
-        makeSearchSuggestions(fullList)
+        ddType2.value = "";
+        ddType2.options.length = 1;
+        makeSearchSuggestions(fullList);
     } else {
         hiddenSpan.style.display = "block";
         buttonText.innerHTML = "Less ▲";
@@ -89,10 +95,6 @@ function takeFive (list) {
         }
     }
 }
-
-// const  fetchSingleUrl = (URLarray) => {
-//     Promise.all(URLarray.map(url=> fetch(url).then((response)=>response.json()))).then((result)=> console.log('result :>> ', result))
-// }
 
 function makeSearchSuggestions(list) {
     spotForButton.innerHTML = "";
